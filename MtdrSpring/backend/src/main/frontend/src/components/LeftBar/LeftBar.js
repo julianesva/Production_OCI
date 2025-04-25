@@ -1,58 +1,47 @@
 import './LeftBar.css'
 import { useState } from 'react'
-import { Arrow_Left_Icon, Arrow_Right_Icon } from '../../Icons'
+import { useNavigate } from 'react-router-dom'
+import LeftBarArrow from './LeftBarArrow/LeftBarArrow'
 
 export default function LeftBar() {
     const [isLeftBarHidden, setIsLeftBarHidden] = useState(false)
 
+    const navigate = useNavigate()
+
+    const handleNavigate = (path) => {
+        navigate(path)
+    }
+
     return (
         <div className='leftbar-main'>
-            {/* Hide | Unhide LeftBar Button */}
-            <div className='leftbar-arrow-button-container'>
-                <button onClick={() => setIsLeftBarHidden(!isLeftBarHidden)}>
-                    {isLeftBarHidden ?
-                        <Arrow_Left_Icon color="#312D2A" w='23px' h='23px' />
-                        :
-                        <Arrow_Right_Icon color="#312D2A" w='23px' h='23px' />
-                    }
-                </button>
-            </div>
+            {/* LeftBar Arrow Button */}
+            <LeftBarArrow isLeftBarHidden={isLeftBarHidden} setIsLeftBarHidden={setIsLeftBarHidden} />
 
+            {/* LeftBar Container */}
             {isLeftBarHidden ?
-                <>
+                <div className='leftbar-container'>
                     {/* LeftBar links */}
                     <div className='leftbar-links-container'>
-                        <button>
-                            <p className='leftbar-links-text'>View my Teams</p>
-                        </button>
+                        <div className='leftbar-links-text-container'>
+                            <button onClick={() => handleNavigate('/')}>
+                                <p className='leftbar-links-text'>Dashboard</p>
+                            </button>
 
-                        <button>
-                            <p className='leftbar-links-text'>Dashboard</p>
-                        </button>
+                            <button onClick={() => handleNavigate('/report')}>
+                                <p className='leftbar-links-text'>Report</p>
+                            </button>
+                        </div>
 
-                        <button>
-                            <p className='leftbar-links-text'>Quality</p>
-                        </button>
-                        
-                        <button>
-                            <p className='leftbar-links-text'>Design</p>
-                        </button>
-                        
-                        <button>
-                            <p className='leftbar-links-text'>Bugs</p>
-                        </button>
-                        
-                        <button>
-                            <p className='leftbar-links-text'>Releases</p>
-                        </button>
+                        {/* <div className='leftbar-links-text-container'>
+                            <button>
+                                <p className='leftbar-links-text'>Settings</p>
+                            </button>
+                        </div> */}
                     </div>
 
-                    <div className='leftbar-links-container'>
-                        <button>
-                            <p className='leftbar-links-text'>Settings</p>
-                        </button>
-                    </div>
-                </>
+                    {/* LeftBar Arrow Button */}
+                    <LeftBarArrow isLeftBarHidden={isLeftBarHidden} setIsLeftBarHidden={setIsLeftBarHidden} />
+                </div>
             : null}
         </div>
     )

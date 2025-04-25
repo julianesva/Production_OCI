@@ -2,9 +2,10 @@ import './DashboardInput.css'
 import { useState, useEffect } from 'react';
 import { API_MODULES } from '../../../API';
 
-export default function DashboardInput({ addItem, isInserting }) {
+export default function DashboardInput({ employeesList, addItem, isInserting }) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [responsible, setResponsible] = useState('');
     const [storyPoints, setStoryPoints] = useState('');
     const [hours, setHours] = useState('');
     const [modules, setModules] = useState([]); 
@@ -13,24 +14,26 @@ export default function DashboardInput({ addItem, isInserting }) {
     const clearFields = () => {
         setTitle('');
         setDescription('');
+        setResponsible('');
         setStoryPoints('');
         setHours('');
         setSelectedModule('');
     }
 
     function handleSubmit(e) {
-        if (isInserting) {
+        if (isInserting || responsible == '') {
             return;
         }
-        
-        addItem({
+        const data = {
             title: title,
             description: description,
             story_Points: storyPoints,
             estimatedTime: hours,
             done: 0,
-            moduleId: selectedModule.id
-        });
+            moduleId: selectedModule.id,
+            responsible: responsible
+        }
+        addItem(data);
         clearFields();
         e.preventDefault();
     }
@@ -41,6 +44,10 @@ export default function DashboardInput({ addItem, isInserting }) {
             .then(data => setModules(data))
             .catch(error => console.error("Error fetching modules:", error));
     }, []);
+
+    useEffect(() => {
+        console.log("Selected Responsible:", responsible);
+    }, [responsible])
 
 
     return (
@@ -67,6 +74,20 @@ export default function DashboardInput({ addItem, isInserting }) {
                 }}
             />
 
+            {/* Select Responsible */}
+            <select
+                className='dashboard-input-format dashboard-module-select-input'
+                value={responsible}
+                onChange={(e) => setResponsible(e.target.value)}
+            >
+                <option value="" disabled selected>Responsible</option>
+                {employeesList.map((employee) => (
+                    <option key={employee.id} value={employee.id}>
+                        {employee.user.username}
+                    </option>
+                ))}
+            </select>
+
             {/* Input Story Points */}
             <input type="number" className='dashboard-input-format num-input' placeholder='Story Points' min={1} max={10}
                 value={storyPoints}
@@ -89,7 +110,7 @@ export default function DashboardInput({ addItem, isInserting }) {
                 }}
             />
 
-            {/* Dropdown para seleccionar el módulo */}
+            {/* Select Module */}
             <select
                 className='dashboard-input-format dashboard-module-select-input'
                 id="moduleSelect"
@@ -100,12 +121,16 @@ export default function DashboardInput({ addItem, isInserting }) {
                 setSelectedModule(module);
                 }}
             >
-                <option value="">Select Module</option>
-                {modules.map((module) => (
-                    <option key={module.id} value={module.id}>
-                        {module.id} - {module.title}
-                    </option>
-                ))}
+                <option value="" disabled selected>Sprint</option>
+                {modules &&
+                    [...modules]
+                        .sort((a, b) => a.id - b.id)
+                        .map((module) => (
+                            <option key={module.id} value={module.id}>
+                                {module.id} - {module.title}
+                            </option>
+                        ))
+                }
             </select>
 
             {/* Search Button */}

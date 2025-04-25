@@ -1,7 +1,12 @@
 package com.springboot.MyTodoList.model;
 
 import javax.persistence.*;
+
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "MODULES")
@@ -35,6 +40,12 @@ public class Module {
 
     @Column(name = "PARENT_MODULE")
     private Integer parentModule;
+
+
+     @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MODULE_ID", referencedColumnName = "MODULE_ID", insertable = false, updatable = false)
+    @JsonManagedReference  // Add this annotation
+    private Set<ToDoItem> tasks;
 
     // Default constructor
     public Module() {
@@ -127,6 +138,13 @@ public class Module {
         this.parentModule = parentModule;
     }
 
+    public Set<ToDoItem> getTasks() {
+        return tasks;
+    }
+    public void setTasks(Set<ToDoItem> tasks) {
+        this.tasks = tasks;
+    }
+
     @Override
     public String toString() {
         return "Module{" +
@@ -139,6 +157,7 @@ public class Module {
                 ", startDate=" + startDate +
                 ", dateLimit=" + dateLimit +
                 ", parentModule=" + parentModule +
+                ", tasks=" + tasks +
                 '}';
     }
 }

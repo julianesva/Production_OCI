@@ -24,7 +24,6 @@
 
 .dashboard-table-separation {
     width: 100%;
-    padding: 0px 30px;
 }
 
 .dashboard-table-task-table {
@@ -61,17 +60,31 @@
 
 .dashboard-table-num-column {
     text-align: center;
+    width: 100px;
 }
 
 .dashboard-table-actions-column {
     width: 110px;
 }
 
+.dashboard-table-title-column {
+    width: 200px;
+}
+
+.dashboard-table-description-column {
+    min-width: 200px;
+}
+
+.dashboard-table-responsible-column {
+    min-width: 120px;
+}
+
 .dashboard-table-actions-container {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: 15px;
 }
 
 .dashboard-table-action-next-button {
@@ -102,4 +115,8 @@
 .dashboard-table-empty-text {
     font-size: 14px;
     color: #312D2A;
+}
+
+.dashboard-table-border-inline {
+    border-inline: 1px solid #000000;
 }

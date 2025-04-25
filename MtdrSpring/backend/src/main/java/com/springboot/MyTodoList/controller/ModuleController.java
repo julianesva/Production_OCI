@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/modules")
+@CrossOrigin(origins = "*") 
 public class ModuleController {
 
     @Autowired

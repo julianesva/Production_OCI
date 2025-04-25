@@ -2,20 +2,26 @@ import './DashboardTasksTable.css'
 import { useState, useEffect } from 'react'
 import { Arrow_Down_Icon, Arrow_Up_Icon, Trash_Icon } from '../../../Icons'
 
-export default function DashboardTasksTable({ taskList, moduleFilter, filter, title, action, toggleDone, deleteItem }) {
+export default function DashboardTasksTable({ items, employeesList, moduleFilter, filter, title, action, handle_set_Real_Hours, deleteItem, setIsHiddenRealHours }) {
     const [isHidden, setIsHidden] = useState(false);
 
     function handleNextButton(event, task) {
         if (task.done == 0) {
-            toggleDone(event, task.id, task.title, task.description, 1, task.estimatedTime, task.story_Points, task.moduleId)
+            setIsHiddenRealHours(false)
+            handle_set_Real_Hours(event, task.id, task.title, task.description, 1, task.estimatedTime, task.story_Points, task.moduleId)
         } else if (task.done == 1) {
-            toggleDone(event, task.id, task.title, task.description, 0, task.estimatedTime, task.story_Points, task.moduleId)
+            handle_set_Real_Hours(event, task.id, task.title, task.description, 0, task.estimatedTime, task.story_Points, task.moduleId)
         } // else if (task.done == 2) {
-        //     toggleDone(event, task.id, task.title, task.description, 0, task.estimatedTime, task.story_Points)
+        //     handle_set_Real_Hours(event, task.id, task.title, task.description, 0, task.estimatedTime, task.story_Points)
         // }
         else {
             console.error("Invalid task status:", task.done)
         }
+    }
+
+    function get_user_by_id(id) {
+        const user = employeesList.find(user => user.id == id);
+        return user ? user.user.username : '';
     }
 
     useEffect(() => {
@@ -42,7 +48,7 @@ export default function DashboardTasksTable({ taskList, moduleFilter, filter, ti
             <div className='dashboard-table-big-separation'>
                 {/* Hidden | Unhidden Table */}
                 {isHidden ? null :
-                    taskList.length == 0 ?
+                    !employeesList ?
                         <div className='dashboard-table-empty'>
                             <p className='dashboard-table-empty-text'>All clear</p>
                         </div>
@@ -52,39 +58,47 @@ export default function DashboardTasksTable({ taskList, moduleFilter, filter, ti
                                 <thead>
                                     <tr>
                                         <th className='dashboard-table-task-table-head-left'>Title</th>
-                                        <th className='dashboard-table-task-table-head-left'>Description</th>
-                                        <th className='dashboard-table-task-table-head-center'>Hours</th>
-                                        <th className='dashboard-table-task-table-head-center'>Story Points</th>
+                                        <th className='dashboard-table-task-table-head-left dashboard-table-border-inline'>Description</th>
+                                        <th className='dashboard-table-task-table-head-left dashboard-table-border-inline'>Responsible</th>
+                                        <th className='dashboard-table-task-table-head-center dashboard-table-border-inline'>Hours</th>
+                                        {title == 'Completed' &&
+                                            <th className='dashboard-table-task-table-head-center dashboard-table-border-inline'>Real Hours</th>
+                                        }
+                                        <th className='dashboard-table-task-table-head-center dashboard-table-border-inline'>Story Points</th>
                                         <th className='dashboard-table-task-table-head-actions'>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {taskList.filter(task => {
-                                    if (moduleFilter == 'all') {
-                                        return task.done == filter;
-                                    } else {
-                                        return task.done == filter && task.moduleId == moduleFilter;
-                                    }
-                                }).map(task => (
-                                    <tr key={task.id} className='dashboard-table-row'>
-                                    <td className='dashboard-table-text-column'>{task.title}</td>
-                                    <td className='dashboard-table-text-column'>{task.description}</td>
-                                    <td className='dashboard-table-num-column'>{task.estimatedTime}</td>
-                                    <td className='dashboard-table-num-column'>{task.story_Points}</td>
-                                    <td className='dashboard-table-actions-column'>
-                                        <div className='dashboard-table-actions-container'>
-                                        {/* Next Button */}
-                                        <button className='dashboard-table-action-next-button' onClick={(event) => handleNextButton(event, task)}>
-                                            {action}
-                                        </button>
-                                        {/* Delete Button */}
-                                        <button className='dashboard-table-action-trash-button' onClick={() => deleteItem(task.id)}>
-                                            <Trash_Icon color='white' w='16px' h='16px' />
-                                        </button>
-                                        </div>
-                                    </td>
-                                    </tr>
-                                ))}
+                                    {items.filter(task => {
+                                        if (moduleFilter == 'all') {
+                                            return task.done == filter;
+                                        } else {
+                                            return task.done == filter && task.moduleId == moduleFilter;
+                                        }
+                                    }).map(task => (
+                                        <tr key={task.id} className='dashboard-table-row'>
+                                        <td className='dashboard-table-text-column dashboard-table-title-column'>{task.title}</td>
+                                        <td className='dashboard-table-text-column dashboard-table-description-column dashboard-table-border-inline'>{task.description}</td>
+                                        <td className='dashboard-table-text-column dashboard-table-responsible-column dashboard-table-border-inline'>{get_user_by_id(task.responsible)}</td>
+                                        <td className='dashboard-table-num-column dashboard-table-border-inline'>{task.estimatedTime}</td>
+                                        {title == 'Completed' &&
+                                            <td className='dashboard-table-num-column dashboard-table-border-inline'>{task.actualTime}</td>
+                                        }
+                                        <td className='dashboard-table-num-column dashboard-table-border-inline'>{task.story_Points}</td>
+                                        <td className='dashboard-table-actions-column'>
+                                            <div className='dashboard-table-actions-container'>
+                                            {/* Next Button */}
+                                            <button className='dashboard-table-action-next-button' onClick={(event) => handleNextButton(event, task)}>
+                                                {action}
+                                            </button>
+                                            {/* Delete Button */}
+                                            <button className='dashboard-table-action-trash-button' onClick={() => deleteItem(task.id)}>
+                                                <Trash_Icon color='white' w='16px' h='16px' />
+                                            </button>
+                                            </div>
+                                        </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>

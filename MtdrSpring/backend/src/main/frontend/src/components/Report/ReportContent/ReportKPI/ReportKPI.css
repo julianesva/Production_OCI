@@ -1,0 +1,73 @@
+.kpi-main-content-container {
+    width: 100%;
+}
+
+.kpi-title-sections-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #000000;
+}
+
+.kpi-title-sections-text {
+    font-size: 25px;
+    font-weight: 700;
+    padding: 0 0 10px 10px;
+}
+
+.kpi-generate-report-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.kpi-generate-report-button {
+    padding: 4px 8px 6px 8px;
+    border-radius: 12px;
+    background-color: #4A7A7A;
+}
+
+.kpi-generate-report-button-text {
+    font-size: 0.8125rem;
+    color: white;
+}
+
+.kpi-title-sections-button {
+    padding-right: 10px;
+}
+
+.kpi-sections-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.kpi-first-container {
+    margin-top: 20px;
+}
+
+.kpi-main-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-title-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #000000;
+}
+
+.kpi-title-container-text {
+    font-size: 20px;
+    font-weight: 500;
+    padding-left: 5px;
+}
+
+.kpi-title-button {
+    margin-right: 30px;
+}

@@ -49,9 +49,14 @@ public class ToDoItemService {
         Optional<ToDoItem> toDoItemData = toDoItemRepository.findById(id);
         if(toDoItemData.isPresent()){
             ToDoItem toDoItem = toDoItemData.get();
-            toDoItem.setId(id);
-            toDoItem.setCreation_ts(td.getCreation_ts());
+            toDoItem.setTitle(td.getTitle());
+            toDoItem.setModuleId(td.getModuleId());
             toDoItem.setDescription(td.getDescription());
+            toDoItem.setDateLimit(td.getDateLimit());
+            toDoItem.setResponsible(td.getResponsible());
+            toDoItem.setEndingDate(td.getEndingDate());
+            toDoItem.setEstimatedTime(td.getEstimatedTime());
+            toDoItem.setActualTime(td.getActualTime());
             toDoItem.setDone(td.isDone());
             toDoItem.setStory_Points(td.getStory_Points());
             return toDoItemRepository.save(toDoItem);
