@@ -1,0 +1,61 @@
+.dashboard-main-content {
+    flex-grow: 1;
+}
+
+.dashboard-main-content-container {
+    display: flex;
+    flex-direction: column; 
+    gap: 20px;
+}
+
+.welcome-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #5A5957;
+}
+
+.dashboard-title-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dashboard-title-text {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.recommendation-button {
+    padding: 5px 20px 10px 20px;
+    border-radius: 9999px;
+    background-color: #40727D;
+}
+
+.recommendation-button-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: #FFFFFF;
+}
+
+.filter-module-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-module-title-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #5A5957;
+    padding-bottom: 4px;
+}
+
+.filter-module-select {
+    width: 130px;
+    border: 2px solid #E0E0E0;
+    border-radius: 8px;
+    padding: 5px;
+    font-size: 14px;
+}

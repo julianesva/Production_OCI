@@ -1,0 +1,41 @@
+.dashboard-input-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.dashboard-input-format {
+    border: 2px solid #E0E0E0;
+    border-radius: 8px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.description-input {
+    flex-grow: 1;
+}
+
+.num-input {
+    width: 100px;
+}
+
+.dashboard-module-select-input {
+    width: 130px;
+}
+
+.dashboard-input-button {
+    padding: 3px 15px 6px 15px;
+    border-radius: 8px;
+    background-color: #137532;
+}
+
+.dashboard-input-button-text {
+    font-size: 14px;
+    font-weight: 400;
+    color: #FFFFFF;
+}
+
+.dashboard-input-select {
+    color: #6e6e6e;
+}

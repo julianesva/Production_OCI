@@ -1,0 +1,30 @@
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    background-color: #312D2A;
+}
+
+.navbar-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-logo-icon {
+    height: 30px;
+}
+
+.navbar-logo-text {
+    color: white;
+    font-size: 18px;
+    line-height: 1;
+    padding-bottom: 4px;
+}
+
+.navbar-user-container {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}

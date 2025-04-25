@@ -1,0 +1,30 @@
+.dashboard-main {
+    overflow: auto;
+    flex: 1;
+    height: 100%;
+  }
+
+.dashboard-main-container {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+}
+
+.dashboard-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.dashboard-error {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.dashboard-error-text {
+    font-size: 24px;
+    font-weight: bold;
+}

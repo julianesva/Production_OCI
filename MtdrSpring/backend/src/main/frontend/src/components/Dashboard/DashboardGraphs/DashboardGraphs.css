@@ -1,0 +1,9 @@
+.dashboard-graphs-main {
+    width: 500px;
+    border: 2px solid #000;
+}
+
+.dashboard-graphs-main-container {
+    display: flex;
+    flex-direction: column;
+}

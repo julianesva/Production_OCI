@@ -1,0 +1,93 @@
+
+
+export const tasklist = [
+    {
+        id: 1,
+        title: "UI Design for the Main Dashboard",
+        description: "Description of Task 1",
+        estimatedTime: 2,
+        done: 0,
+        story_Points: 5,
+    },
+    {
+        id: 2,
+        title: "High-Fidelity Prototype for the Task Managemente Section",
+        description: "Description of Task 2",
+        estimatedTime: 3,
+        done: 0,
+        story_Points: 8,
+    },
+    {
+        id: 3,
+        title: "Integration Testing for User Authentication Module",
+        description: "Description of Task 3",
+        estimatedTime: 4,
+        done: 0,
+        story_Points: 3,
+    },
+    {
+        id: 4,
+        title: "UX Testing on New User Interface",
+        description: "Description of Task 4",
+        estimatedTime: 1,
+        done: 0,
+        story_Points: 1,
+    },
+    {
+        id: 5,
+        title: "Backend API Development for Task Management",
+        description: "Description of Task 5",
+        estimatedTime: 2,
+        done: 0,
+        story_Points: 4,
+    },
+    {
+        id: 6,
+        title: "Database Schema Design for User Profiles",
+        description: "Description of Task 6",
+        estimatedTime: 3,
+        done: 0,
+        story_Points: 5,
+    },
+    {
+        id: 7,
+        title: "Deployment Strategy for the Main Application",
+        description: "Description of Task 7",
+        estimatedTime: 1,
+        done: 1,
+        story_Points: 9,
+    },
+    {
+        id: 8,
+        title: "Code Review and Refactoring of Task Management Module",
+        description: "Description of Task 8",
+        estimatedTime: 4,
+        done: 1,
+        story_Points: 4,
+    },
+    {
+        id: 9,
+        title: "Documentation for the User Authentication Process",
+        description: "Description of Task 9",
+        estimatedTime: 2,
+        done: 2,
+        story_Points: 3,
+    },
+    {
+        id: 10,
+        title: "Performance Optimization for the Dashboard",
+        description: "Description of Task 10",
+        estimatedTime: 3,
+        done: 2,
+        story_Points: 7,
+    },
+    {
+        id: 11,
+        title: "Security Audit for User Data Protection",
+        description: "Description of Task 11",
+        estimatedTime: 2,
+        done: 2,
+        story_Points: 2,
+    }
+    
+]
