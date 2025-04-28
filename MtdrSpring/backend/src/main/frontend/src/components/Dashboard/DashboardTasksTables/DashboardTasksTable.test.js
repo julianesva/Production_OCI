@@ -147,7 +147,7 @@ describe("DashboardTasksTable Component", () => {
     expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
   });
 
-  // Test filtering tasks by status
+  // Test filtering tasks by status Objective Number 2.1
   test("filters tasks by status correctly", () => {
     render(
       <DashboardTasksTable
@@ -274,8 +274,5 @@ describe("DashboardTasksTable Component", () => {
         setIsHiddenRealHours={mockSetIsHiddenRealHours}
       />
     );
-
-    // Check if "All clear" message is displayed
-    // expect(screen.getByText("All clear")).toBeInTheDocument();
   });
 });

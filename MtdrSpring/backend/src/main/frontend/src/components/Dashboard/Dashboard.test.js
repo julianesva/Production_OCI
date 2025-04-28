@@ -140,7 +140,7 @@ describe("Dashboard Component", () => {
     expect(screen.getByText("2 - Sprint 2")).toBeInTheDocument();
   });
 
-  // Test real-time task visualization
+  // Test real-time task visualization Objective number 1
   test("displays tasks assigned to users in real-time", async () => {
     render(<Dashboard />);
 
@@ -184,7 +184,7 @@ describe("Dashboard Component", () => {
     });
   });
 
-  // Test task completion functionality
+  // Test task completion functionality Objective number 3
   test("updates task status when marked as completed", async () => {
     // Mock the PUT request for updating a task
     server.use(
@@ -241,7 +241,7 @@ describe("Dashboard Component", () => {
     expect(screen.getByText("Task 3")).toBeInTheDocument(); // Completed
   });
 
-  // Test task details display
+  // Test task details display Objective number 4
   test("displays task details correctly", async () => {
     render(<Dashboard />);
 

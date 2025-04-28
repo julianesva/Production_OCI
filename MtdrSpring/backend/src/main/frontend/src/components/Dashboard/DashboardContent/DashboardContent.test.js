@@ -131,7 +131,7 @@ const mockToggleDone = jest.fn();
 const mockDeleteItem = jest.fn();
 
 describe("DashboardContent Component", () => {
-  // Test rendering of dashboard content
+  // Test rendering of dashboard content Objective number 4
   test("renders dashboard content with correct data", () => {
     render(
       <DashboardContent
