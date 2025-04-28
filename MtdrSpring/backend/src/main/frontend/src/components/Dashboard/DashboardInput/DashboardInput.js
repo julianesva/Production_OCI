@@ -143,6 +143,7 @@ export default function DashboardInput({
       <select
         className="dashboard-input-format dashboard-module-select-input"
         id="moduleSelect"
+        data-testid="module-select"
         value={selectedModule ? selectedModule.id : ""}
         onChange={(e) => {
           const moduleId = e.target.value;

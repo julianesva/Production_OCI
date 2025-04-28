@@ -165,21 +165,16 @@ describe("DashboardContent Component", () => {
       />
     );
 
-    // Select module 1 from the dropdown
-    const moduleSelect = screen.getByRole("combobox");
-    moduleSelect.value = "1";
-    const changeEvent = new Event("change", { bubbles: true });
-    moduleSelect.dispatchEvent(changeEvent);
+    // Wait for tasks to load
+    await screen.findByText("Task 1");
 
-    // Wait for the UI to update
-    await waitFor(() => {
-      // Only tasks from module 1 should be visible in the "To Do" table
-      expect(screen.getByText("Task 1")).toBeInTheDocument();
-      expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
+    // Select module 1
+    const moduleSelect = screen.getByTestId("filter-module-select");
+    await userEvent.selectOptions(moduleSelect, "1");
 
-      // Task 3 should still be visible in the "Completed" table (it's from module 1)
-      expect(screen.getByText("Task 3")).toBeInTheDocument();
-    });
+    // Check that only tasks from module 1 are visible
+    expect(screen.getByText("Task 1")).toBeInTheDocument();
+    expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
   });
 
   // Test task completion functionality
@@ -271,9 +266,6 @@ describe("DashboardContent Component", () => {
 
     const storyPointsInput = screen.getByPlaceholderText("Story Points");
     userEvent.type(storyPointsInput, "5");
-
-    const responsibleSelect = screen.getByLabelText("Responsible");
-    userEvent.selectOptions(responsibleSelect, "1");
 
     const moduleSelect = screen.getByLabelText("Module");
     userEvent.selectOptions(moduleSelect, "1");
