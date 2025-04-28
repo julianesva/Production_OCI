@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import DashboardContent from "./DashboardContent";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
-import { API_LIST } from "../../../API";
+import { API_LIST, API_MODULES } from "../../../API";
 
 // Mock data for testing
 const mockTasks = [
@@ -75,6 +75,16 @@ const mockModules = [
 
 // Setup MSW server for mocking HTTP requests
 const server = setupServer(
+  // Mock GET request for fetching tasks
+  rest.get(API_LIST, (req, res, ctx) => {
+    return res(ctx.status(200), ctx.json(mockTasks));
+  }),
+
+  // Mock GET request for fetching modules
+  rest.get(API_MODULES, (req, res, ctx) => {
+    return res(ctx.status(200), ctx.json(mockModules));
+  }),
+
   // Mock PUT request for updating a task
   rest.put(`${API_LIST}/1`, (req, res, ctx) => {
     return res(
@@ -196,13 +206,13 @@ describe("DashboardContent Component", () => {
     fireEvent.click(doneButtons[0]);
 
     // Check if the real hours popup is displayed
-    expect(screen.getByText("Set Real Hours")).toBeInTheDocument();
+    expect(screen.getByText("Task Completion Time")).toBeInTheDocument();
 
     // Enter real hours and confirm
-    const realHoursInput = screen.getByPlaceholderText("Enter real hours");
+    const realHoursInput = screen.getByPlaceholderText("Real Hours");
     userEvent.type(realHoursInput, "6");
 
-    const confirmButton = screen.getByText("Confirm");
+    const confirmButton = screen.getByText("Save");
     fireEvent.click(confirmButton);
 
     // Check if toggleDone was called with the correct parameters
@@ -241,7 +251,7 @@ describe("DashboardContent Component", () => {
   });
 
   // Test adding a new task
-  test("handles adding a new task correctly", () => {
+  test("handles adding a new task correctly", async () => {
     render(
       <DashboardContent
         items={mockTasks}
@@ -261,13 +271,23 @@ describe("DashboardContent Component", () => {
     const descriptionInput = screen.getByPlaceholderText("Description");
     userEvent.type(descriptionInput, "Description for New Task");
 
+    // Select responsible
+    const responsibleSelect = screen.getAllByRole("combobox")[0];
+    userEvent.selectOptions(responsibleSelect, "1");
+
     const hoursInput = screen.getByPlaceholderText("Hours");
     userEvent.type(hoursInput, "10");
 
     const storyPointsInput = screen.getByPlaceholderText("Story Points");
     userEvent.type(storyPointsInput, "5");
 
-    const moduleSelect = screen.getByLabelText("Module");
+    // Wait for modules to be loaded
+    await waitFor(() => {
+      const moduleSelect = screen.getByTestId("module-select");
+      expect(moduleSelect.querySelectorAll("option").length).toBeGreaterThan(1);
+    });
+
+    const moduleSelect = screen.getByTestId("module-select");
     userEvent.selectOptions(moduleSelect, "1");
 
     // Submit the form
@@ -278,11 +298,11 @@ describe("DashboardContent Component", () => {
     expect(mockAddItem).toHaveBeenCalledWith({
       title: "New Task",
       description: "Description for New Task",
-      estimatedTime: 10,
+      estimatedTime: "10",
       done: 0,
-      story_Points: 5,
+      story_Points: "5",
       moduleId: 1,
-      responsible: 1,
+      responsible: "1",
     });
   });
 });
