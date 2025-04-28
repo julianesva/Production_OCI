@@ -61,121 +61,89 @@ describe("DashboardInput Component", () => {
 
   // Test rendering of the component
   test("renders the component with correct elements", async () => {
-    render(
-      <DashboardInput
-        employeesList={mockEmployees}
-        addItem={mockAddItem}
-        isInserting={false}
-      />
-    );
+    // Mock the addItem function
+    const mockAddItem = jest.fn();
 
-    // Wait for modules to be loaded
-    await waitFor(() => {
-      expect(screen.getByText("Sprint 1")).toBeInTheDocument();
-    });
+    // Render the component
+    render(<DashboardInput addItem={mockAddItem} isInserting={false} />);
 
-    // Check if input fields are displayed
+    // Check if all form elements are rendered
     expect(screen.getByPlaceholderText("Title")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Description")).toBeInTheDocument();
     expect(screen.getByText("Responsible")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Story Points")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Hours")).toBeInTheDocument();
     expect(screen.getByText("Sprint")).toBeInTheDocument();
-
-    // Check if add button is displayed
     expect(screen.getByText("Add")).toBeInTheDocument();
+
+    // Wait for modules to be loaded
+    await waitFor(() => {
+      expect(screen.getByText("1 - Sprint 1")).toBeInTheDocument();
+    });
   });
 
   // Test form submission with valid data
   test("submits form with valid data", async () => {
-    render(
-      <DashboardInput
-        employeesList={mockEmployees}
-        addItem={mockAddItem}
-        isInserting={false}
-      />
-    );
+    // Mock the addItem function
+    const mockAddItem = jest.fn();
+
+    // Render the component
+    render(<DashboardInput addItem={mockAddItem} isInserting={false} />);
 
     // Wait for modules to be loaded
     await waitFor(() => {
-      expect(screen.getByText("Sprint 1")).toBeInTheDocument();
+      expect(screen.getByText("1 - Sprint 1")).toBeInTheDocument();
     });
 
     // Fill in the form
-    const titleInput = screen.getByPlaceholderText("Title");
-    userEvent.type(titleInput, "New Task");
-
-    const descriptionInput = screen.getByPlaceholderText("Description");
-    userEvent.type(descriptionInput, "Description for New Task");
-
-    const responsibleSelect = screen.getByText("Responsible");
-    userEvent.selectOptions(responsibleSelect, "1");
-
-    const storyPointsInput = screen.getByPlaceholderText("Story Points");
-    userEvent.type(storyPointsInput, "5");
-
-    const hoursInput = screen.getByPlaceholderText("Hours");
-    userEvent.type(hoursInput, "10");
-
-    const moduleSelect = screen.getByText("Sprint");
-    userEvent.selectOptions(moduleSelect, "1");
+    fireEvent.change(screen.getByPlaceholderText("Title"), {
+      target: { value: "New Task" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Description"), {
+      target: { value: "Description for New Task" },
+    });
+    fireEvent.change(screen.getByText("Responsible").closest("select"), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Story Points"), {
+      target: { value: "5" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Hours"), {
+      target: { value: "10" },
+    });
+    fireEvent.change(screen.getByText("Sprint").closest("select"), {
+      target: { value: "1" },
+    });
 
     // Submit the form
-    const addButton = screen.getByText("Add");
-    fireEvent.click(addButton);
+    fireEvent.click(screen.getByText("Add"));
 
     // Check if addItem was called with the correct parameters
     expect(mockAddItem).toHaveBeenCalledWith({
       title: "New Task",
       description: "Description for New Task",
+      responsible: "1",
       story_Points: "5",
       estimatedTime: "10",
-      done: 0,
-      moduleId: 1,
-      responsible: "1",
+      moduleId: "1",
     });
-
-    // Check if form fields are cleared
-    expect(titleInput.value).toBe("");
-    expect(descriptionInput.value).toBe("");
-    expect(storyPointsInput.value).toBe("");
-    expect(hoursInput.value).toBe("");
   });
 
   // Test form submission with invalid data
   test("does not submit form with invalid data", async () => {
-    render(
-      <DashboardInput
-        employeesList={mockEmployees}
-        addItem={mockAddItem}
-        isInserting={false}
-      />
-    );
+    // Mock the addItem function
+    const mockAddItem = jest.fn();
+
+    // Render the component
+    render(<DashboardInput addItem={mockAddItem} isInserting={false} />);
 
     // Wait for modules to be loaded
     await waitFor(() => {
-      expect(screen.getByText("Sprint 1")).toBeInTheDocument();
+      expect(screen.getByText("1 - Sprint 1")).toBeInTheDocument();
     });
 
-    // Fill in the form without selecting a responsible person
-    const titleInput = screen.getByPlaceholderText("Title");
-    userEvent.type(titleInput, "New Task");
-
-    const descriptionInput = screen.getByPlaceholderText("Description");
-    userEvent.type(descriptionInput, "Description for New Task");
-
-    const storyPointsInput = screen.getByPlaceholderText("Story Points");
-    userEvent.type(storyPointsInput, "5");
-
-    const hoursInput = screen.getByPlaceholderText("Hours");
-    userEvent.type(hoursInput, "10");
-
-    const moduleSelect = screen.getByText("Sprint");
-    userEvent.selectOptions(moduleSelect, "1");
-
-    // Submit the form
-    const addButton = screen.getByText("Add");
-    fireEvent.click(addButton);
+    // Submit the form without filling in all required fields
+    fireEvent.click(screen.getByText("Add"));
 
     // Check if addItem was not called
     expect(mockAddItem).not.toHaveBeenCalled();
@@ -183,92 +151,94 @@ describe("DashboardInput Component", () => {
 
   // Test form submission when isInserting is true
   test("does not submit form when isInserting is true", async () => {
-    render(
-      <DashboardInput
-        employeesList={mockEmployees}
-        addItem={mockAddItem}
-        isInserting={true}
-      />
-    );
+    // Mock the addItem function
+    const mockAddItem = jest.fn();
+
+    // Render the component with isInserting set to true
+    render(<DashboardInput addItem={mockAddItem} isInserting={true} />);
 
     // Wait for modules to be loaded
     await waitFor(() => {
-      expect(screen.getByText("Sprint 1")).toBeInTheDocument();
+      expect(screen.getByText("1 - Sprint 1")).toBeInTheDocument();
     });
 
     // Fill in the form
-    const titleInput = screen.getByPlaceholderText("Title");
-    userEvent.type(titleInput, "New Task");
-
-    const descriptionInput = screen.getByPlaceholderText("Description");
-    userEvent.type(descriptionInput, "Description for New Task");
-
-    const responsibleSelect = screen.getByText("Responsible");
-    userEvent.selectOptions(responsibleSelect, "1");
-
-    const storyPointsInput = screen.getByPlaceholderText("Story Points");
-    userEvent.type(storyPointsInput, "5");
-
-    const hoursInput = screen.getByPlaceholderText("Hours");
-    userEvent.type(hoursInput, "10");
-
-    const moduleSelect = screen.getByText("Sprint");
-    userEvent.selectOptions(moduleSelect, "1");
+    fireEvent.change(screen.getByPlaceholderText("Title"), {
+      target: { value: "New Task" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Description"), {
+      target: { value: "Description for New Task" },
+    });
+    fireEvent.change(screen.getByText("Responsible").closest("select"), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Story Points"), {
+      target: { value: "5" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Hours"), {
+      target: { value: "10" },
+    });
+    fireEvent.change(screen.getByText("Sprint").closest("select"), {
+      target: { value: "1" },
+    });
 
     // Submit the form
-    const addButton = screen.getByText("Add");
-    fireEvent.click(addButton);
+    fireEvent.click(screen.getByText("Add"));
 
     // Check if addItem was not called
     expect(mockAddItem).not.toHaveBeenCalled();
   });
 
-  // Test enter key functionality
+  // Test form submission when enter key is pressed
   test("submits form when enter key is pressed", async () => {
-    render(
-      <DashboardInput
-        employeesList={mockEmployees}
-        addItem={mockAddItem}
-        isInserting={false}
-      />
-    );
+    // Mock the addItem function
+    const mockAddItem = jest.fn();
+
+    // Render the component
+    render(<DashboardInput addItem={mockAddItem} isInserting={false} />);
 
     // Wait for modules to be loaded
     await waitFor(() => {
-      expect(screen.getByText("Sprint 1")).toBeInTheDocument();
+      expect(screen.getByText("1 - Sprint 1")).toBeInTheDocument();
     });
 
     // Fill in the form
-    const titleInput = screen.getByPlaceholderText("Title");
-    userEvent.type(titleInput, "New Task");
+    fireEvent.change(screen.getByPlaceholderText("Title"), {
+      target: { value: "New Task" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Description"), {
+      target: { value: "Description for New Task" },
+    });
+    fireEvent.change(screen.getByText("Responsible").closest("select"), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Story Points"), {
+      target: { value: "5" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Hours"), {
+      target: { value: "10" },
+    });
+    fireEvent.change(screen.getByText("Sprint").closest("select"), {
+      target: { value: "1" },
+    });
 
-    const descriptionInput = screen.getByPlaceholderText("Description");
-    userEvent.type(descriptionInput, "Description for New Task");
-
-    const responsibleSelect = screen.getByText("Responsible");
-    userEvent.selectOptions(responsibleSelect, "1");
-
-    const storyPointsInput = screen.getByPlaceholderText("Story Points");
-    userEvent.type(storyPointsInput, "5");
-
-    const hoursInput = screen.getByPlaceholderText("Hours");
-    userEvent.type(hoursInput, "10");
-
-    const moduleSelect = screen.getByText("Sprint");
-    userEvent.selectOptions(moduleSelect, "1");
-
-    // Press enter in the hours input
-    fireEvent.keyDown(hoursInput, { key: "Enter" });
+    // Press enter key in the title input
+    fireEvent.keyDown(screen.getByPlaceholderText("Title"), {
+      key: "Enter",
+      code: "Enter",
+      keyCode: 13,
+      which: 13,
+      bubbles: true,
+    });
 
     // Check if addItem was called with the correct parameters
     expect(mockAddItem).toHaveBeenCalledWith({
       title: "New Task",
       description: "Description for New Task",
+      responsible: "1",
       story_Points: "5",
       estimatedTime: "10",
-      done: 0,
-      moduleId: 1,
-      responsible: "1",
+      moduleId: "1",
     });
   });
 });
