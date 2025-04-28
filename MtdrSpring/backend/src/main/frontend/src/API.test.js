@@ -5,6 +5,7 @@ import {
   API_TEAM_DATA,
   API_HEADERS,
 } from "./API";
+import "@testing-library/jest-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 
