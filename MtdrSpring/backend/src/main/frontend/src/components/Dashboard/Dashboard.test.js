@@ -117,11 +117,9 @@ describe("Dashboard Component", () => {
 
     // Wait for error message to appear
     await waitFor(() => {
-      const errorElement = screen.getByText((content, element) => {
-        return element.textContent.includes(
-          "Something went wrong loading Tasks"
-        );
-      });
+      const errorElement = screen.getByText(
+        /Error: Something went wrong loading Tasks\.\.\./i
+      );
       expect(errorElement).toBeInTheDocument();
     });
   });
@@ -170,16 +168,27 @@ describe("Dashboard Component", () => {
     // Check if task details are displayed correctly
     expect(screen.getByText("Description for Task 1")).toBeInTheDocument();
 
-    // Find the specific user1 text in the task table
-    const taskRows = screen.getAllByRole("row");
-    const userCell = taskRows.find(
-      (row) =>
-        row.textContent.includes("Task 1") && row.textContent.includes("user1")
-    );
-    expect(userCell).toBeTruthy();
+    // Find Task 1's row and verify its contents
+    const task1Title = screen.getAllByText("Task 1")[0];
+    const task1Row = task1Title.closest("tr");
+    expect(task1Row).toBeTruthy();
 
-    expect(screen.getByText("5")).toBeInTheDocument(); // estimatedTime for Task 1
-    expect(screen.getByText("3")).toBeInTheDocument(); // story_Points for Task 1
+    // Check user assignment
+    const responsibleCell = task1Row.querySelector(
+      ".dashboard-table-responsible-column"
+    );
+    expect(responsibleCell.textContent).toBe("user1");
+
+    // Check estimated time and story points
+    const estimatedTimeCell = task1Row.querySelector(
+      ".dashboard-table-num-column"
+    );
+    const storyPointsCell = Array.from(
+      task1Row.querySelectorAll(".dashboard-table-num-column")
+    ).pop();
+
+    expect(estimatedTimeCell.textContent).toBe("5");
+    expect(storyPointsCell.textContent).toBe("3");
   });
 
   // Test task filtering by module
