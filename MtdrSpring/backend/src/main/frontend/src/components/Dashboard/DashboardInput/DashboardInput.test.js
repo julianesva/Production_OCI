@@ -120,8 +120,17 @@ describe("DashboardInput Component", () => {
     fireEvent.change(screen.getByPlaceholderText("Hours"), {
       target: { value: "10" },
     });
-    fireEvent.change(screen.getByText("Sprint").closest("select"), {
+
+    // Select the module - this is the key part
+    const moduleSelect = screen.getByText("Sprint").closest("select");
+    fireEvent.change(moduleSelect, {
       target: { value: "1" },
+    });
+
+    // Wait for the component to process the module selection
+    await waitFor(() => {
+      // This ensures the component has processed the module selection
+      expect(moduleSelect.value).toBe("1");
     });
 
     // Submit the form
@@ -146,7 +155,7 @@ describe("DashboardInput Component", () => {
     expect(actualCall).toHaveProperty("responsible", "1");
     expect(actualCall).toHaveProperty("story_Points", "5");
     expect(actualCall).toHaveProperty("estimatedTime", "10");
-    expect(actualCall).toHaveProperty("moduleId");
+    expect(actualCall).toHaveProperty("moduleId", 1);
     expect(actualCall).toHaveProperty("done", 0);
   });
 
