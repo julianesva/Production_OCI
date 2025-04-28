@@ -358,4 +358,198 @@ describe("Report Component", () => {
       expect(screen.getByText(/Error:/)).toBeInTheDocument();
     });
   });
+
+  // Test task data state changes
+  test("displays task data with correct information", async () => {
+    // Mock task data with specific fields
+    const mockTaskData = [
+      {
+        teamId: "Team A",
+        user: {
+          username: "user1",
+        },
+        tasksCompleted: [
+          {
+            id: 1,
+            name: "Task 1",
+            moduleId: 1,
+            estimatedTime: 5,
+            actualTime: 6,
+            storyPoints: 3,
+          },
+        ],
+        uncompletedTasks: [
+          {
+            id: 2,
+            name: "Task 2",
+            moduleId: 1,
+            estimatedTime: 4,
+            storyPoints: 2,
+          },
+        ],
+      },
+    ];
+
+    // Override the server handler for this test
+    server.use(
+      rest.get(API_TEAM_DATA, (req, res, ctx) => {
+        return res(ctx.json(mockTaskData));
+      })
+    );
+
+    render(<Report />);
+
+    // Wait for loading to complete
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Select team
+    const teamSelect = screen
+      .getByText("Team:")
+      .closest("div")
+      .querySelector("select");
+    userEvent.selectOptions(teamSelect, "Team A");
+
+    // Select member
+    const memberSelect = screen
+      .getByText("Member:")
+      .closest("div")
+      .querySelector("select");
+    userEvent.selectOptions(memberSelect, "user1");
+
+    // Select sprint
+    const sprintSelect = screen
+      .getByText("Sprint:")
+      .closest("div")
+      .querySelector("select");
+    userEvent.selectOptions(sprintSelect, "1");
+
+    // Click generate report button
+    const generateButton = screen.getByText("Generate Report");
+    fireEvent.click(generateButton);
+
+    // Wait for task data to be displayed
+    await waitFor(() => {
+      // Check if task name is displayed
+      expect(screen.getByText("Task 1")).toBeInTheDocument();
+
+      // Check if developer name is displayed
+      expect(screen.getByText("user1")).toBeInTheDocument();
+
+      // Check if story points are displayed
+      expect(screen.getByText("3")).toBeInTheDocument();
+
+      // Check if estimated hours are displayed
+      expect(screen.getByText("5")).toBeInTheDocument();
+
+      // Check if actual hours are displayed
+      expect(screen.getByText("6")).toBeInTheDocument();
+    });
+  });
+
+  // Test listing completed tasks by sprint
+  test("lists completed tasks by sprint with minimum information", async () => {
+    // Mock task data with multiple completed tasks in different sprints
+    const mockTaskData = [
+      {
+        teamId: "Team A",
+        user: {
+          username: "user1",
+        },
+        tasksCompleted: [
+          {
+            id: 1,
+            name: "Task 1",
+            moduleId: 1,
+            estimatedTime: 5,
+            actualTime: 6,
+          },
+          {
+            id: 2,
+            name: "Task 2",
+            moduleId: 2,
+            estimatedTime: 4,
+            actualTime: 5,
+          },
+        ],
+        uncompletedTasks: [],
+      },
+    ];
+
+    // Override the server handler for this test
+    server.use(
+      rest.get(API_TEAM_DATA, (req, res, ctx) => {
+        return res(ctx.json(mockTaskData));
+      })
+    );
+
+    render(<Report />);
+
+    // Wait for loading to complete
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Select team
+    const teamSelect = screen
+      .getByText("Team:")
+      .closest("div")
+      .querySelector("select");
+    userEvent.selectOptions(teamSelect, "Team A");
+
+    // Select member
+    const memberSelect = screen
+      .getByText("Member:")
+      .closest("div")
+      .querySelector("select");
+    userEvent.selectOptions(memberSelect, "user1");
+
+    // Select sprint 1
+    const sprintSelect = screen
+      .getByText("Sprint:")
+      .closest("div")
+      .querySelector("select");
+    userEvent.selectOptions(sprintSelect, "1");
+
+    // Click generate report button
+    const generateButton = screen.getByText("Generate Report");
+    fireEvent.click(generateButton);
+
+    // Wait for sprint 1 task data to be displayed
+    await waitFor(() => {
+      // Check if task name is displayed
+      expect(screen.getByText("Task 1")).toBeInTheDocument();
+
+      // Check if developer name is displayed
+      expect(screen.getByText("user1")).toBeInTheDocument();
+
+      // Check if estimated hours are displayed
+      expect(screen.getByText("5")).toBeInTheDocument();
+
+      // Check if actual hours are displayed
+      expect(screen.getByText("6")).toBeInTheDocument();
+    });
+
+    // Select sprint 2
+    userEvent.selectOptions(sprintSelect, "2");
+
+    // Click generate report button again
+    fireEvent.click(generateButton);
+
+    // Wait for sprint 2 task data to be displayed
+    await waitFor(() => {
+      // Check if task name is displayed
+      expect(screen.getByText("Task 2")).toBeInTheDocument();
+
+      // Check if developer name is displayed
+      expect(screen.getByText("user1")).toBeInTheDocument();
+
+      // Check if estimated hours are displayed
+      expect(screen.getByText("4")).toBeInTheDocument();
+
+      // Check if actual hours are displayed
+      expect(screen.getByText("5")).toBeInTheDocument();
+    });
+  });
 });

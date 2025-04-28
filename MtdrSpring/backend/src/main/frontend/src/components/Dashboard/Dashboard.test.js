@@ -280,4 +280,148 @@ describe("Dashboard Component", () => {
       expect(screen.getByText("Task 3")).toBeInTheDocument();
     });
   });
+
+  // Test task data state changes Objective
+  test("displays task data with correct information", async () => {
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Check if task details are displayed correctly in the "To Do" table
+    const todoTask = screen.getByText("Task 1").closest("tr");
+    expect(todoTask).toHaveTextContent("user1"); // Developer name
+    expect(todoTask).toHaveTextContent("3"); // Story points
+    expect(todoTask).toHaveTextContent("5"); // Estimated hours
+
+    // Check if task details are displayed correctly in the "Completed" table
+    const completedTask = screen.getByText("Task 3").closest("tr");
+    expect(completedTask).toHaveTextContent("user1"); // Developer name
+    expect(completedTask).toHaveTextContent("2"); // Story points
+    expect(completedTask).toHaveTextContent("3"); // Estimated hours
+    expect(completedTask).toHaveTextContent("4"); // Actual hours
+  });
+
+  // Test changing task data (name, developer, story points, estimated hours) Objective Number 2
+  test("updates task data when modified", async () => {
+    // Create a modified version of the mock tasks
+    const modifiedTasks = [
+      {
+        id: 1,
+        title: "Updated Task 1", // Changed task name
+        description: "Description for Task 1",
+        estimatedTime: 8, // Changed estimated hours
+        done: 0, // Status remains the same
+        story_Points: 5, // Changed story points
+        moduleId: 1,
+        responsible: 2, // Changed developer
+        actualTime: 0,
+      },
+      {
+        id: 2,
+        title: "Task 2",
+        description: "Description for Task 2",
+        estimatedTime: 8,
+        done: 0,
+        story_Points: 5,
+        moduleId: 2,
+        responsible: 2,
+        actualTime: 0,
+      },
+      {
+        id: 3,
+        title: "Task 3",
+        description: "Description for Task 3",
+        estimatedTime: 3,
+        done: 1,
+        story_Points: 2,
+        moduleId: 1,
+        responsible: 1,
+        actualTime: 4,
+      },
+    ];
+
+    // Mock the GET request for tasks with the modified data
+    server.use(
+      rest.get(`${API_LIST}`, (req, res, ctx) => {
+        return res(ctx.status(200), ctx.json(modifiedTasks));
+      })
+    );
+
+    // Mock the PUT request for updating a task
+    server.use(
+      rest.put(`${API_LIST}/1`, (req, res, ctx) => {
+        return res(
+          ctx.status(200),
+          ctx.json({
+            id: 1,
+            title: "Updated Task 1",
+            description: "Description for Task 1",
+            estimatedTime: 8,
+            done: 0, // Status remains the same
+            story_Points: 5,
+            moduleId: 1,
+            responsible: 2,
+            actualTime: 0,
+          })
+        );
+      })
+    );
+
+    render(<Dashboard />);
+
+    // Wait for the component to load
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Find the task by its ID in the table
+    const taskRows = screen.getAllByRole("row");
+    const taskRow = taskRows.find((row) =>
+      row.textContent.includes("Updated Task 1")
+    );
+
+    // Verify the task data has been updated
+    expect(taskRow).toBeInTheDocument();
+    expect(taskRow).toHaveTextContent("user2"); // Updated developer
+    expect(taskRow).toHaveTextContent("5"); // Updated story points
+    expect(taskRow).toHaveTextContent("8"); // Updated estimated hours
+  });
+
+  // Test listing completed tasks by sprint
+  test("lists completed tasks by sprint with minimum information", async () => {
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Find the filter select element
+    const filterContainer = screen
+      .getByText("Filter by Sprint:")
+      .closest("div");
+    const moduleSelect = filterContainer.querySelector("select");
+
+    // Select Sprint 1
+    fireEvent.change(moduleSelect, { target: { value: "1" } });
+
+    // Wait for the UI to update
+    await waitFor(() => {
+      // Check completed task in Sprint 1
+      const completedTask = screen.getByText("Task 3").closest("tr");
+      expect(completedTask).toHaveTextContent("user1"); // Developer name
+      expect(completedTask).toHaveTextContent("3"); // Estimated hours
+      expect(completedTask).toHaveTextContent("4"); // Actual hours
+    });
+
+    // Select Sprint 2
+    fireEvent.change(moduleSelect, { target: { value: "2" } });
+
+    // Wait for the UI to update
+    await waitFor(() => {
+      // No completed tasks in Sprint 2
+      expect(screen.queryByText("Task 3")).not.toBeInTheDocument();
+    });
+  });
 });
