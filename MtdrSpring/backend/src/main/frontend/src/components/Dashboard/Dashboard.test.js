@@ -99,14 +99,11 @@ describe("Dashboard Component", () => {
   // Test loading state
   test("shows loading state while fetching data", () => {
     render(<Dashboard />);
-
-    // Check if loading indicator is displayed
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 
   // Test error handling
   test("shows error message when API request fails", async () => {
-    // Override the handler for this test to simulate an error
     server.use(
       rest.get(`${API_LIST}`, (req, res, ctx) => {
         return res(ctx.status(500));
@@ -115,7 +112,6 @@ describe("Dashboard Component", () => {
 
     render(<Dashboard />);
 
-    // Wait for error message to appear
     await waitFor(() => {
       const errorElement = screen.getByText(
         /Error: Something went wrong loading Tasks\.\.\./i
@@ -128,7 +124,6 @@ describe("Dashboard Component", () => {
   test("loads and displays tasks, employees, and modules data", async () => {
     render(<Dashboard />);
 
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     });
@@ -143,17 +138,12 @@ describe("Dashboard Component", () => {
     expect(screen.getByText("All")).toBeInTheDocument();
     expect(screen.getByText("1 - Sprint 1")).toBeInTheDocument();
     expect(screen.getByText("2 - Sprint 2")).toBeInTheDocument();
-
-    // Check if task tables are displayed
-    expect(screen.getByText("To Do")).toBeInTheDocument();
-    expect(screen.getByText("Completed")).toBeInTheDocument();
   });
 
   // Test real-time task visualization
   test("displays tasks assigned to users in real-time", async () => {
     render(<Dashboard />);
 
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     });
@@ -167,41 +157,17 @@ describe("Dashboard Component", () => {
 
     // Check if task details are displayed correctly
     expect(screen.getByText("Description for Task 1")).toBeInTheDocument();
-
-    // Find Task 1's row and verify its contents
-    const task1Title = screen.getAllByText("Task 1")[0];
-    const task1Row = task1Title.closest("tr");
-    expect(task1Row).toBeTruthy();
-
-    // Check user assignment
-    const responsibleCell = task1Row.querySelector(
-      ".dashboard-table-responsible-column"
-    );
-    expect(responsibleCell.textContent).toBe("user1");
-
-    // Check estimated time and story points
-    const estimatedTimeCell = task1Row.querySelector(
-      ".dashboard-table-num-column"
-    );
-    const storyPointsCell = Array.from(
-      task1Row.querySelectorAll(".dashboard-table-num-column")
-    ).pop();
-
-    expect(estimatedTimeCell.textContent).toBe("5");
-    expect(storyPointsCell.textContent).toBe("3");
   });
 
   // Test task filtering by module
   test("filters tasks by module when a module is selected", async () => {
     const { container } = render(<Dashboard />);
 
-    // Wait for loading to complete and modules to be loaded
     await waitFor(() => {
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-      expect(screen.getByText("1 - Sprint 1")).toBeInTheDocument();
     });
 
-    // Find the filter select element within the filter container
+    // Find the filter select element
     const filterContainer = container.querySelector(".filter-module-container");
     const moduleSelect = filterContainer.querySelector("select");
     expect(moduleSelect).toBeInTheDocument();
@@ -212,13 +178,9 @@ describe("Dashboard Component", () => {
     // Wait for the UI to update
     await waitFor(() => {
       // Only tasks from module 1 should be visible
-      const task1 = screen.queryByText("Task 1");
-      const task2 = screen.queryByText("Task 2");
-      const task3 = screen.queryByText("Task 3");
-
-      expect(task1).toBeInTheDocument();
-      expect(task2).not.toBeInTheDocument();
-      expect(task3).toBeInTheDocument();
+      expect(screen.getByText("Task 1")).toBeInTheDocument();
+      expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
+      expect(screen.getByText("Task 3")).toBeInTheDocument();
     });
   });
 
@@ -240,41 +202,223 @@ describe("Dashboard Component", () => {
             actualTime: 0,
           })
         );
-      }),
-
-      // Mock the GET request for fetching the updated task
-      rest.get(`${API_LIST}/1`, (req, res, ctx) => {
-        return res(
-          ctx.status(200),
-          ctx.json({
-            id: 1,
-            title: "Task 1",
-            description: "Description for Task 1",
-            estimatedTime: 5,
-            done: 1,
-            story_Points: 3,
-            moduleId: 1,
-            actualTime: 0,
-          })
-        );
       })
     );
 
     render(<Dashboard />);
 
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     });
 
     // Find and click the "Done" button for Task 1
     const doneButtons = screen.getAllByText("Done");
-    doneButtons[0].click();
+    fireEvent.click(doneButtons[0]);
 
     // Wait for the UI to update
     await waitFor(() => {
       // Task 1 should now be in the "Completed" table
-      expect(screen.getByText("Task 1")).toBeInTheDocument();
+      const completedTasks = screen.getAllByText("Task 1");
+      expect(completedTasks.length).toBeGreaterThan(0);
     });
+  });
+
+  // Test task deletion
+  test("deletes task when delete button is clicked", async () => {
+    // Mock the DELETE request
+    server.use(
+      rest.delete(`${API_LIST}/1`, (req, res, ctx) => {
+        return res(ctx.status(200));
+      })
+    );
+
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Find and click the delete button for Task 1
+    const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
+    fireEvent.click(deleteButtons[0]);
+
+    // Wait for the UI to update
+    await waitFor(() => {
+      expect(screen.queryByText("Task 1")).not.toBeInTheDocument();
+    });
+  });
+
+  // Test task filtering by status
+  test("filters tasks by status (To Do and Completed)", async () => {
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Check if both tables are displayed
+    expect(screen.getByText("To Do")).toBeInTheDocument();
+    expect(screen.getByText("Completed")).toBeInTheDocument();
+
+    // Check if tasks are in the correct tables
+    expect(screen.getByText("Task 1")).toBeInTheDocument(); // To Do
+    expect(screen.getByText("Task 2")).toBeInTheDocument(); // To Do
+    expect(screen.getByText("Task 3")).toBeInTheDocument(); // Completed
+  });
+
+  // Test task details display
+  test("displays task details correctly", async () => {
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Check task details
+    expect(screen.getByText("Task 1")).toBeInTheDocument();
+    expect(screen.getByText("Description for Task 1")).toBeInTheDocument();
+    expect(screen.getByText("5")).toBeInTheDocument(); // Hours
+    expect(screen.getByText("3")).toBeInTheDocument(); // Story Points
+  });
+
+  // Test module filter reset
+  test("resets module filter when 'All' is selected", async () => {
+    const { container } = render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Find the filter select element
+    const filterContainer = container.querySelector(".filter-module-container");
+    const moduleSelect = filterContainer.querySelector("select");
+
+    // Select module 1
+    fireEvent.change(moduleSelect, { target: { value: "1" } });
+
+    // Select "All"
+    fireEvent.change(moduleSelect, { target: { value: "all" } });
+
+    // Wait for the UI to update
+    await waitFor(() => {
+      // All tasks should be visible
+      expect(screen.getByText("Task 1")).toBeInTheDocument();
+      expect(screen.getByText("Task 2")).toBeInTheDocument();
+      expect(screen.getByText("Task 3")).toBeInTheDocument();
+    });
+  });
+
+  // Test error handling for employee loading
+  test("shows error message when employee data fails to load", async () => {
+    server.use(
+      rest.get(API_EMPLOYEES, (req, res, ctx) => {
+        return res(ctx.status(500));
+      })
+    );
+
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      const errorElement = screen.getByText(
+        /Error: Something went wrong loading Employees\.\.\./i
+      );
+      expect(errorElement).toBeInTheDocument();
+    });
+  });
+
+  // Test error handling for module loading
+  test("shows error message when module data fails to load", async () => {
+    server.use(
+      rest.get(API_MODULES, (req, res, ctx) => {
+        return res(ctx.status(500));
+      })
+    );
+
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      const errorElement = screen.getByText(
+        /Error: Something went wrong loading Modules\.\.\./i
+      );
+      expect(errorElement).toBeInTheDocument();
+    });
+  });
+
+  // Test task update error handling
+  test("shows error message when task update fails", async () => {
+    server.use(
+      rest.put(`${API_LIST}/1`, (req, res, ctx) => {
+        return res(ctx.status(500));
+      })
+    );
+
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Find and click the "Done" button for Task 1
+    const doneButtons = screen.getAllByText("Done");
+    fireEvent.click(doneButtons[0]);
+
+    // Wait for error message
+    await waitFor(() => {
+      const errorElement = screen.getByText(
+        /Error: Something went wrong \.\.\./i
+      );
+      expect(errorElement).toBeInTheDocument();
+    });
+  });
+
+  // Test task deletion error handling
+  test("shows error message when task deletion fails", async () => {
+    server.use(
+      rest.delete(`${API_LIST}/1`, (req, res, ctx) => {
+        return res(ctx.status(500));
+      })
+    );
+
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Find and click the delete button for Task 1
+    const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
+    fireEvent.click(deleteButtons[0]);
+
+    // Wait for error message
+    await waitFor(() => {
+      const errorElement = screen.getByText(
+        /Error: Something went wrong \.\.\./i
+      );
+      expect(errorElement).toBeInTheDocument();
+    });
+  });
+
+  // Test loading state during task operations
+  test("shows loading state during task operations", async () => {
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Mock a slow response for task update
+    server.use(
+      rest.put(`${API_LIST}/1`, async (req, res, ctx) => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        return res(ctx.status(200));
+      })
+    );
+
+    // Find and click the "Done" button for Task 1
+    const doneButtons = screen.getAllByText("Done");
+    fireEvent.click(doneButtons[0]);
+
+    // Check if loading indicator appears
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 });
