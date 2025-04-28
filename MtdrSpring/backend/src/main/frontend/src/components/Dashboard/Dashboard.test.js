@@ -114,7 +114,7 @@ describe("Dashboard Component", () => {
 
     await waitFor(() => {
       const errorElement = screen.getByText(
-        "Something went wrong loading Tasks..."
+        "Error: Something went wrong loading Tasks..."
       );
       expect(errorElement).toBeInTheDocument();
     });

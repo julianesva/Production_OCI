@@ -13,7 +13,7 @@ export default function DashboardInput({
   const [storyPoints, setStoryPoints] = useState("");
   const [hours, setHours] = useState("");
   const [modules, setModules] = useState([]);
-  const [selectedModule, setSelectedModule] = useState("");
+  const [selectedModule, setSelectedModule] = useState(null);
 
   const clearFields = () => {
     setTitle("");
@@ -21,13 +21,25 @@ export default function DashboardInput({
     setResponsible("");
     setStoryPoints("");
     setHours("");
-    setSelectedModule("");
+    setSelectedModule(null);
   };
 
   function handleSubmit(e) {
-    if (isInserting || responsible == "") {
+    e.preventDefault();
+
+    // Check if all required fields are filled
+    if (
+      isInserting ||
+      !title ||
+      !description ||
+      !responsible ||
+      !storyPoints ||
+      !hours ||
+      !selectedModule
+    ) {
       return;
     }
+
     const data = {
       title: title,
       description: description,
@@ -37,9 +49,9 @@ export default function DashboardInput({
       moduleId: selectedModule.id,
       responsible: responsible,
     };
+
     addItem(data);
     clearFields();
-    e.preventDefault();
   }
 
   useEffect(() => {
@@ -48,10 +60,6 @@ export default function DashboardInput({
       .then((data) => setModules(data))
       .catch((error) => console.error("Error fetching modules:", error));
   }, []);
-
-  useEffect(() => {
-    console.log("Selected Responsible:", responsible);
-  }, [responsible]);
 
   return (
     <div className="dashboard-input-container">
@@ -92,11 +100,12 @@ export default function DashboardInput({
         <option value="" disabled selected>
           Responsible
         </option>
-        {employeesList.map((employee) => (
-          <option key={employee.id} value={employee.id}>
-            {employee.user.username}
-          </option>
-        ))}
+        {employeesList &&
+          employeesList.map((employee) => (
+            <option key={employee.id} value={employee.id}>
+              {employee.user.username}
+            </option>
+          ))}
       </select>
 
       {/* Input Story Points */}

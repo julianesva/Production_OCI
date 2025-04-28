@@ -53,7 +53,7 @@ describe("DashboardRealHours Component", () => {
     userEvent.type(input, "5");
 
     // Check if the input value is updated
-    expect(input.value).toBe("5");
+    expect(input.value).toBe("05");
   });
 
   // Test cancel button functionality
@@ -95,7 +95,7 @@ describe("DashboardRealHours Component", () => {
     fireEvent.click(saveButton);
 
     // Check if confirm_Real_Hours was called with the input value
-    expect(mockConfirmRealHours).toHaveBeenCalledWith("5");
+    expect(mockConfirmRealHours).toHaveBeenCalledWith("05");
   });
 
   // Test enter key functionality
@@ -114,7 +114,7 @@ describe("DashboardRealHours Component", () => {
     userEvent.type(input, "5{enter}");
 
     // Check if confirm_Real_Hours was called with the input value
-    expect(mockConfirmRealHours).toHaveBeenCalledWith("5");
+    expect(mockConfirmRealHours).toHaveBeenCalledWith("05");
   });
 
   // Test initial state

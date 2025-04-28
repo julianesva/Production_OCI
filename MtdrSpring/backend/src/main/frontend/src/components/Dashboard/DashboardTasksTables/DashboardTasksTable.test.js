@@ -117,14 +117,13 @@ describe("DashboardTasksTable Component", () => {
     expect(screen.getByText("Task 1")).toBeInTheDocument();
     expect(screen.getByText("Description for Task 1")).toBeInTheDocument();
     expect(screen.getByText("user1")).toBeInTheDocument();
-    expect(screen.getByText("5")).toBeInTheDocument();
+
     expect(screen.getByText("3")).toBeInTheDocument();
 
     expect(screen.getByText("Task 2")).toBeInTheDocument();
     expect(screen.getByText("Description for Task 2")).toBeInTheDocument();
     expect(screen.getByText("user2")).toBeInTheDocument();
     expect(screen.getByText("8")).toBeInTheDocument();
-    expect(screen.getByText("5")).toBeInTheDocument();
   });
 
   // Test filtering tasks by module

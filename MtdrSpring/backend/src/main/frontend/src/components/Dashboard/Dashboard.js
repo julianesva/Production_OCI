@@ -243,7 +243,9 @@ export default function Dashboard() {
       ) : error ? (
         // Error
         <div className="dashboard-error">
-          <p className="dashboard-error-text">Error: {error}</p>
+          <p className="dashboard-error-text">
+            Error: {error.message || error.toString()}
+          </p>
         </div>
       ) : (
         // Dashboard
