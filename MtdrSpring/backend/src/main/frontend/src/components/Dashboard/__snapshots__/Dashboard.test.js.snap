@@ -1,0 +1,532 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Dashboard Component Dashboard component matches snapshot 1`] = `
+<div>
+  <div
+    class="dashboard-main"
+  >
+    <div
+      class="dashboard-main-container"
+    >
+      <div
+        class="dashboard-main-content"
+      >
+        <div
+          class="dashboard-main-content-container"
+        >
+          <div
+            class="dashboard-title-container"
+          >
+            <p
+              class="dashboard-title-text"
+            >
+              Dashboard
+            </p>
+            <button
+              class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall css-11n98c0-MuiButtonBase-root-MuiButton-root"
+              tabindex="0"
+              type="button"
+            >
+              Recommendation
+              <span
+                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+              />
+            </button>
+          </div>
+          <div
+            class="dashboard-input-container"
+          >
+            <input
+              class="dashboard-input-format"
+              placeholder="Title"
+              type="text"
+              value=""
+            />
+            <input
+              class="dashboard-input-format description-input"
+              placeholder="Description"
+              type="text"
+              value=""
+            />
+            <select
+              class="dashboard-input-format dashboard-module-select-input"
+            >
+              <option
+                disabled=""
+                value=""
+              >
+                Responsible
+              </option>
+              <option
+                value="1"
+              >
+                user1
+              </option>
+              <option
+                value="2"
+              >
+                user2
+              </option>
+            </select>
+            <input
+              class="dashboard-input-format num-input"
+              max="10"
+              min="1"
+              placeholder="Story Points"
+              type="number"
+              value=""
+            />
+            <input
+              class="dashboard-input-format num-input"
+              min="1"
+              placeholder="Hours"
+              type="number"
+              value=""
+            />
+            <select
+              class="dashboard-input-format dashboard-module-select-input"
+              data-testid="module-select"
+              id="moduleSelect"
+            >
+              <option
+                disabled=""
+                value=""
+              >
+                Sprint
+              </option>
+            </select>
+            <button
+              class="dashboard-input-button"
+            >
+              <p
+                class="dashboard-input-button-text"
+              >
+                Add
+              </p>
+            </button>
+          </div>
+          <div
+            class="filter-module-container"
+          >
+            <p
+              class="filter-module-title-text"
+            >
+              Filter by Sprint:
+            </p>
+            <select
+              class="filter-module-select"
+              data-testid="filter-module-select"
+            >
+              <option
+                value="all"
+              >
+                All
+              </option>
+              <option
+                value="1"
+              >
+                1 - Sprint 1
+              </option>
+              <option
+                value="2"
+              >
+                2 - Sprint 2
+              </option>
+            </select>
+          </div>
+          <div
+            class="dashboard-table-container"
+          >
+            <div
+              class="dashboard-table-title-container"
+            >
+              <p
+                class="dashboard-table-title"
+              >
+                To Do
+              </p>
+              <button>
+                <svg
+                  class="tabler-icon tabler-icon-caret-down "
+                  fill="none"
+                  height="25px"
+                  stroke="black"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="25px"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 10l6 6l6 -6h-12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div
+              class="dashboard-table-big-separation"
+            >
+              <div
+                class="dashboard-table-separation"
+              >
+                <table
+                  class="dashboard-table-task-table"
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        class="dashboard-table-task-table-head-left"
+                      >
+                        Title
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-left dashboard-table-border-inline"
+                      >
+                        Description
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-left dashboard-table-border-inline"
+                      >
+                        Responsible
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-center dashboard-table-border-inline"
+                      >
+                        Hours
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-center dashboard-table-border-inline"
+                      >
+                        Story Points
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-actions"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      class="dashboard-table-row"
+                    >
+                      <td
+                        class="dashboard-table-text-column dashboard-table-title-column"
+                      >
+                        Task 1
+                      </td>
+                      <td
+                        class="dashboard-table-text-column dashboard-table-description-column dashboard-table-border-inline"
+                      >
+                        Description for Task 1
+                      </td>
+                      <td
+                        class="dashboard-table-text-column dashboard-table-responsible-column dashboard-table-border-inline"
+                      >
+                        user1
+                      </td>
+                      <td
+                        class="dashboard-table-num-column dashboard-table-border-inline"
+                      >
+                        5
+                      </td>
+                      <td
+                        class="dashboard-table-num-column dashboard-table-border-inline"
+                      >
+                        3
+                      </td>
+                      <td
+                        class="dashboard-table-actions-column"
+                      >
+                        <div
+                          class="dashboard-table-actions-container"
+                        >
+                          <button
+                            class="dashboard-table-action-next-button"
+                          >
+                            Done
+                          </button>
+                          <button
+                            class="dashboard-table-action-trash-button"
+                          >
+                            <svg
+                              class="tabler-icon tabler-icon-trash "
+                              fill="none"
+                              height="16px"
+                              stroke="white"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              viewBox="0 0 24 24"
+                              width="16px"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M4 7l16 0"
+                              />
+                              <path
+                                d="M10 11l0 6"
+                              />
+                              <path
+                                d="M14 11l0 6"
+                              />
+                              <path
+                                d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"
+                              />
+                              <path
+                                d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr
+                      class="dashboard-table-row"
+                    >
+                      <td
+                        class="dashboard-table-text-column dashboard-table-title-column"
+                      >
+                        Task 2
+                      </td>
+                      <td
+                        class="dashboard-table-text-column dashboard-table-description-column dashboard-table-border-inline"
+                      >
+                        Description for Task 2
+                      </td>
+                      <td
+                        class="dashboard-table-text-column dashboard-table-responsible-column dashboard-table-border-inline"
+                      >
+                        user2
+                      </td>
+                      <td
+                        class="dashboard-table-num-column dashboard-table-border-inline"
+                      >
+                        8
+                      </td>
+                      <td
+                        class="dashboard-table-num-column dashboard-table-border-inline"
+                      >
+                        5
+                      </td>
+                      <td
+                        class="dashboard-table-actions-column"
+                      >
+                        <div
+                          class="dashboard-table-actions-container"
+                        >
+                          <button
+                            class="dashboard-table-action-next-button"
+                          >
+                            Done
+                          </button>
+                          <button
+                            class="dashboard-table-action-trash-button"
+                          >
+                            <svg
+                              class="tabler-icon tabler-icon-trash "
+                              fill="none"
+                              height="16px"
+                              stroke="white"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              viewBox="0 0 24 24"
+                              width="16px"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M4 7l16 0"
+                              />
+                              <path
+                                d="M10 11l0 6"
+                              />
+                              <path
+                                d="M14 11l0 6"
+                              />
+                              <path
+                                d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"
+                              />
+                              <path
+                                d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div
+            class="dashboard-table-container"
+          >
+            <div
+              class="dashboard-table-title-container"
+            >
+              <p
+                class="dashboard-table-title"
+              >
+                Completed
+              </p>
+              <button>
+                <svg
+                  class="tabler-icon tabler-icon-caret-down "
+                  fill="none"
+                  height="25px"
+                  stroke="black"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="25px"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 10l6 6l6 -6h-12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div
+              class="dashboard-table-big-separation"
+            >
+              <div
+                class="dashboard-table-separation"
+              >
+                <table
+                  class="dashboard-table-task-table"
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        class="dashboard-table-task-table-head-left"
+                      >
+                        Title
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-left dashboard-table-border-inline"
+                      >
+                        Description
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-left dashboard-table-border-inline"
+                      >
+                        Responsible
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-center dashboard-table-border-inline"
+                      >
+                        Hours
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-center dashboard-table-border-inline"
+                      >
+                        Real Hours
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-center dashboard-table-border-inline"
+                      >
+                        Story Points
+                      </th>
+                      <th
+                        class="dashboard-table-task-table-head-actions"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      class="dashboard-table-row"
+                    >
+                      <td
+                        class="dashboard-table-text-column dashboard-table-title-column"
+                      >
+                        Task 3
+                      </td>
+                      <td
+                        class="dashboard-table-text-column dashboard-table-description-column dashboard-table-border-inline"
+                      >
+                        Description for Task 3
+                      </td>
+                      <td
+                        class="dashboard-table-text-column dashboard-table-responsible-column dashboard-table-border-inline"
+                      >
+                        user1
+                      </td>
+                      <td
+                        class="dashboard-table-num-column dashboard-table-border-inline"
+                      >
+                        3
+                      </td>
+                      <td
+                        class="dashboard-table-num-column dashboard-table-border-inline"
+                      >
+                        4
+                      </td>
+                      <td
+                        class="dashboard-table-num-column dashboard-table-border-inline"
+                      >
+                        2
+                      </td>
+                      <td
+                        class="dashboard-table-actions-column"
+                      >
+                        <div
+                          class="dashboard-table-actions-container"
+                        >
+                          <button
+                            class="dashboard-table-action-next-button"
+                          >
+                            Undo
+                          </button>
+                          <button
+                            class="dashboard-table-action-trash-button"
+                          >
+                            <svg
+                              class="tabler-icon tabler-icon-trash "
+                              fill="none"
+                              height="16px"
+                              stroke="white"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              viewBox="0 0 24 24"
+                              width="16px"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M4 7l16 0"
+                              />
+                              <path
+                                d="M10 11l0 6"
+                              />
+                              <path
+                                d="M14 11l0 6"
+                              />
+                              <path
+                                d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"
+                              />
+                              <path
+                                d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

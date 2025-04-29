@@ -102,6 +102,19 @@ describe("Dashboard Component", () => {
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 
+  // Snapshot test for Dashboard component
+  test("Dashboard component matches snapshot", async () => {
+    const { container } = render(<Dashboard />);
+
+    // Wait for loading to complete
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Take a snapshot of the rendered component
+    expect(container).toMatchSnapshot();
+  });
+
   // Test error handling
   test("shows error message when API request fails", async () => {
     server.use(
