@@ -1,9 +1,10 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/extend-expect";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import Dashboard from "./Dashboard";
-import { API_LIST, API_EMPLOYEES, API_MODULES, API_HEADERS } from "../../API";
+import { API_LIST, API_EMPLOYEES, API_MODULES } from "../../API";
 
 // Mock data for testing
 const mockTasks = [
@@ -100,6 +101,21 @@ describe("Dashboard Component", () => {
   test("shows loading state while fetching data", () => {
     render(<Dashboard />);
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
+
+
+  });
+
+   // Snapshot test for Dashboard component
+   test("Dashboard component matches snapshot", async () => {
+    const { container } = render(<Dashboard />);
+
+    // Wait for loading to complete
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    // Take a snapshot of the rendered component
+    expect(container).toMatchSnapshot();
   });
 
   // Test error handling
@@ -161,20 +177,20 @@ describe("Dashboard Component", () => {
 
   // Test task filtering by module
   test("filters tasks by module when a module is selected", async () => {
+    const user = userEvent.setup();
     const { container } = render(<Dashboard />);
-
+  
     await waitFor(() => {
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     });
-
+    
     // Find the filter select element
-    const filterContainer = container.querySelector(".filter-module-container");
-    const moduleSelect = filterContainer.querySelector("select");
+    const moduleSelect = container.querySelector(".filter-module-container select");
     expect(moduleSelect).toBeInTheDocument();
 
     // Select module 1
-    fireEvent.change(moduleSelect, { target: { value: "1" } });
-
+    await user.selectOptions(moduleSelect, "1");
+  
     // Wait for the UI to update
     await waitFor(() => {
       // Only tasks from module 1 should be visible
@@ -183,9 +199,11 @@ describe("Dashboard Component", () => {
       expect(screen.getByText("Task 3")).toBeInTheDocument();
     });
   });
+  
 
   // Test task completion functionality Objective number 3
   test("updates task status when marked as completed", async () => {
+    const user = userEvent.setup();
     // Mock the PUT request for updating a task
     server.use(
       rest.put(`${API_LIST}/1`, (req, res, ctx) => {
@@ -213,7 +231,7 @@ describe("Dashboard Component", () => {
 
     // Find and click the "Done" button for Task 1
     const doneButtons = screen.getAllByText("Done");
-    fireEvent.click(doneButtons[0]);
+    await user.click(doneButtons[0]);
 
     // Wait for the UI to update
     await waitFor(() => {
@@ -256,6 +274,7 @@ describe("Dashboard Component", () => {
 
   // Test module filter reset
   test("resets module filter when 'All' is selected", async () => {
+    const user = userEvent.setup();
     const { container } = render(<Dashboard />);
 
     await waitFor(() => {
@@ -267,10 +286,10 @@ describe("Dashboard Component", () => {
     const moduleSelect = filterContainer.querySelector("select");
 
     // Select module 1
-    fireEvent.change(moduleSelect, { target: { value: "1" } });
+    await user.selectOptions(moduleSelect, "1");
 
     // Select "All"
-    fireEvent.change(moduleSelect, { target: { value: "all" } });
+    await user.selectOptions(moduleSelect, "all");
 
     // Wait for the UI to update
     await waitFor(() => {
@@ -392,6 +411,7 @@ describe("Dashboard Component", () => {
   // Test listing completed tasks by sprint
   test("lists completed tasks by sprint with minimum information", async () => {
     render(<Dashboard />);
+    const user = userEvent.setup();
 
     await waitFor(() => {
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
@@ -404,7 +424,7 @@ describe("Dashboard Component", () => {
     const moduleSelect = filterContainer.querySelector("select");
 
     // Select Sprint 1
-    fireEvent.change(moduleSelect, { target: { value: "1" } });
+    await user.selectOptions(moduleSelect, "1");
 
     // Wait for the UI to update
     await waitFor(() => {
@@ -416,7 +436,7 @@ describe("Dashboard Component", () => {
     });
 
     // Select Sprint 2
-    fireEvent.change(moduleSelect, { target: { value: "2" } });
+    await user.selectOptions(moduleSelect, "2");
 
     // Wait for the UI to update
     await waitFor(() => {

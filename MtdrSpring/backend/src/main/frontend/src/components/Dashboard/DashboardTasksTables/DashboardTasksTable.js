@@ -74,95 +74,103 @@ export default function DashboardTasksTable({
       {/* Big Bottom Outline */}
       <div className="dashboard-table-big-separation">
         {/* Hidden | Unhidden Table */}
-        {isHidden ? null : !employeesList ? (
-          <div className="dashboard-table-empty">
-            <p className="dashboard-table-empty-text">All clear</p>
-          </div>
-        ) : (
+        {isHidden ? null : (
           <div className="dashboard-table-separation">
-            <table className="dashboard-table-task-table">
-              <thead>
-                <tr>
-                  <th className="dashboard-table-task-table-head-left">
-                    Title
-                  </th>
-                  <th className="dashboard-table-task-table-head-left dashboard-table-border-inline">
-                    Description
-                  </th>
-                  <th className="dashboard-table-task-table-head-left dashboard-table-border-inline">
-                    Responsible
-                  </th>
-                  <th className="dashboard-table-task-table-head-center dashboard-table-border-inline">
-                    Hours
-                  </th>
-                  {title == "Completed" && (
-                    <th className="dashboard-table-task-table-head-center dashboard-table-border-inline">
-                      Real Hours
+            {items.filter((task) => {
+              if (moduleFilter == "all") {
+                return task.done == filter;
+              } else {
+                return task.done == filter && task.moduleId == moduleFilter;
+              }
+            }).length === 0 ? (
+              <div className="dashboard-table-empty">
+                <p className="dashboard-table-empty-text">All clear</p>
+              </div>
+            ) : (
+              <table className="dashboard-table-task-table">
+                <thead>
+                  <tr>
+                    <th className="dashboard-table-task-table-head-left">
+                      Title
                     </th>
-                  )}
-                  <th className="dashboard-table-task-table-head-center dashboard-table-border-inline">
-                    Story Points
-                  </th>
-                  <th className="dashboard-table-task-table-head-actions">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {items
-                  .filter((task) => {
-                    if (moduleFilter == "all") {
-                      return task.done == filter;
-                    } else {
-                      return (
-                        task.done == filter && task.moduleId == moduleFilter
-                      );
-                    }
-                  })
-                  .map((task) => (
-                    <tr key={task.id} className="dashboard-table-row">
-                      <td className="dashboard-table-text-column dashboard-table-title-column">
-                        {task.title}
-                      </td>
-                      <td className="dashboard-table-text-column dashboard-table-description-column dashboard-table-border-inline">
-                        {task.description}
-                      </td>
-                      <td className="dashboard-table-text-column dashboard-table-responsible-column dashboard-table-border-inline">
-                        {get_user_by_id(task.responsible)}
-                      </td>
-                      <td className="dashboard-table-num-column dashboard-table-border-inline">
-                        {task.estimatedTime}
-                      </td>
-                      {title == "Completed" && (
-                        <td className="dashboard-table-num-column dashboard-table-border-inline">
-                          {task.actualTime}
+                    <th className="dashboard-table-task-table-head-left dashboard-table-border-inline">
+                      Description
+                    </th>
+                    <th className="dashboard-table-task-table-head-left dashboard-table-border-inline">
+                      Responsible
+                    </th>
+                    <th className="dashboard-table-task-table-head-center dashboard-table-border-inline">
+                      Hours
+                    </th>
+                    {title == "Completed" && (
+                      <th className="dashboard-table-task-table-head-center dashboard-table-border-inline">
+                        Real Hours
+                      </th>
+                    )}
+                    <th className="dashboard-table-task-table-head-center dashboard-table-border-inline">
+                      Story Points
+                    </th>
+                    <th className="dashboard-table-task-table-head-actions">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items
+                    .filter((task) => {
+                      if (moduleFilter == "all") {
+                        return task.done == filter;
+                      } else {
+                        return (
+                          task.done == filter && task.moduleId == moduleFilter
+                        );
+                      }
+                    })
+                    .map((task) => (
+                      <tr key={task.id} className="dashboard-table-row">
+                        <td className="dashboard-table-text-column dashboard-table-title-column">
+                          {task.title}
                         </td>
-                      )}
-                      <td className="dashboard-table-num-column dashboard-table-border-inline">
-                        {task.story_Points}
-                      </td>
-                      <td className="dashboard-table-actions-column">
-                        <div className="dashboard-table-actions-container">
-                          {/* Next Button */}
-                          <button
-                            className="dashboard-table-action-next-button"
-                            onClick={(event) => handleNextButton(event, task)}
-                          >
-                            {action}
-                          </button>
-                          {/* Delete Button */}
-                          <button
-                            className="dashboard-table-action-trash-button"
-                            onClick={() => deleteItem(task.id)}
-                          >
-                            <Trash_Icon color="white" w="16px" h="16px" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+                        <td className="dashboard-table-text-column dashboard-table-description-column dashboard-table-border-inline">
+                          {task.description}
+                        </td>
+                        <td className="dashboard-table-text-column dashboard-table-responsible-column dashboard-table-border-inline">
+                          {get_user_by_id(task.responsible)}
+                        </td>
+                        <td className="dashboard-table-num-column dashboard-table-border-inline">
+                          {task.estimatedTime}
+                        </td>
+                        {title == "Completed" && (
+                          <td className="dashboard-table-num-column dashboard-table-border-inline">
+                            {task.actualTime}
+                          </td>
+                        )}
+                        <td className="dashboard-table-num-column dashboard-table-border-inline">
+                          {task.story_Points}
+                        </td>
+                        <td className="dashboard-table-actions-column">
+                          <div className="dashboard-table-actions-container">
+                            {/* Next Button */}
+                            <button
+                              className="dashboard-table-action-next-button"
+                              onClick={(event) => handleNextButton(event, task)}
+                            >
+                              {action}
+                            </button>
+                            {/* Delete Button */}
+                            <button
+                              className="dashboard-table-action-trash-button"
+                              onClick={() => deleteItem(task.id)}
+                            >
+                              <Trash_Icon color="white" w="16px" h="16px" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
       </div>

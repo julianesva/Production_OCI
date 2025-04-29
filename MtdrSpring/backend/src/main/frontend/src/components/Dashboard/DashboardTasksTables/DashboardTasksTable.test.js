@@ -1,10 +1,10 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import DashboardTasksTable from "./DashboardTasksTable";
-import { API_LIST, API_HEADERS } from "../../../API";
+import { API_LIST } from "../../../API";
 
 // Mock data for testing
 const mockTasks = [
@@ -64,12 +64,9 @@ const mockEmployees = [
 
 // Setup MSW server for mocking HTTP requests
 const server = setupServer(
-  // Mock GET request for tasks
   rest.get(`${API_LIST}`, (req, res, ctx) => {
     return res(ctx.status(200), ctx.json(mockTasks));
   }),
-
-  // Mock GET request for employees
   rest.get("/employees", (req, res, ctx) => {
     return res(ctx.status(200), ctx.json(mockEmployees));
   })
@@ -86,7 +83,6 @@ const mockDeleteItem = jest.fn();
 const mockSetIsHiddenRealHours = jest.fn();
 
 describe("DashboardTasksTable Component", () => {
-  // Test rendering of tasks table
   test("renders tasks table with correct data", () => {
     render(
       <DashboardTasksTable
@@ -102,10 +98,7 @@ describe("DashboardTasksTable Component", () => {
       />
     );
 
-    // Check if table title is rendered
     expect(screen.getByText("To Do")).toBeInTheDocument();
-
-    // Check if table headers are rendered
     expect(screen.getByText("Title")).toBeInTheDocument();
     expect(screen.getByText("Description")).toBeInTheDocument();
     expect(screen.getByText("Responsible")).toBeInTheDocument();
@@ -113,11 +106,9 @@ describe("DashboardTasksTable Component", () => {
     expect(screen.getByText("Story Points")).toBeInTheDocument();
     expect(screen.getByText("Actions")).toBeInTheDocument();
 
-    // Check if task data is rendered correctly
     expect(screen.getByText("Task 1")).toBeInTheDocument();
     expect(screen.getByText("Description for Task 1")).toBeInTheDocument();
     expect(screen.getByText("user1")).toBeInTheDocument();
-
     expect(screen.getByText("3")).toBeInTheDocument();
 
     expect(screen.getByText("Task 2")).toBeInTheDocument();
@@ -126,7 +117,6 @@ describe("DashboardTasksTable Component", () => {
     expect(screen.getByText("8")).toBeInTheDocument();
   });
 
-  // Test filtering tasks by module
   test("filters tasks by module correctly", () => {
     render(
       <DashboardTasksTable
@@ -142,12 +132,10 @@ describe("DashboardTasksTable Component", () => {
       />
     );
 
-    // Only Task 1 should be visible (moduleId: 1)
     expect(screen.getByText("Task 1")).toBeInTheDocument();
     expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
   });
 
-  // Test filtering tasks by status Objective Number 2.1
   test("filters tasks by status correctly", () => {
     render(
       <DashboardTasksTable
@@ -163,18 +151,15 @@ describe("DashboardTasksTable Component", () => {
       />
     );
 
-    // Only Task 3 should be visible (done: 1)
     expect(screen.queryByText("Task 1")).not.toBeInTheDocument();
     expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
     expect(screen.getByText("Task 3")).toBeInTheDocument();
 
-    // Check if "Real Hours" column is visible for completed tasks
     expect(screen.getByText("Real Hours")).toBeInTheDocument();
-    expect(screen.getByText("4")).toBeInTheDocument(); // actualTime for Task 3
+    expect(screen.getByText("4")).toBeInTheDocument();
   });
 
-  // Test hiding/showing table
-  test("toggles table visibility when hide/show button is clicked", () => {
+  test("toggles table visibility when hide/show button is clicked", async () => {
     render(
       <DashboardTasksTable
         items={mockTasks}
@@ -189,29 +174,23 @@ describe("DashboardTasksTable Component", () => {
       />
     );
 
-    // Table should be visible initially
     expect(screen.getByText("Task 1")).toBeInTheDocument();
 
-    // Click the hide button - use a more specific selector
-    // Find the button in the title container
     const titleContainer = screen
       .getByText("To Do")
       .closest(".dashboard-table-title-container");
     const hideButton = titleContainer.querySelector("button");
-    fireEvent.click(hideButton);
 
-    // Table should be hidden
+    await userEvent.click(hideButton);
+
     expect(screen.queryByText("Task 1")).not.toBeInTheDocument();
 
-    // Click the show button
-    fireEvent.click(hideButton);
+    await userEvent.click(hideButton);
 
-    // Table should be visible again
     expect(screen.getByText("Task 1")).toBeInTheDocument();
   });
 
-  // Test task completion functionality
-  test('calls handle_set_Real_Hours when "Done" button is clicked', () => {
+  test('calls handle_set_Real_Hours when "Done" button is clicked', async () => {
     render(
       <DashboardTasksTable
         items={mockTasks}
@@ -226,17 +205,14 @@ describe("DashboardTasksTable Component", () => {
       />
     );
 
-    // Find and click the "Done" button for Task 1
     const doneButtons = screen.getAllByText("Done");
-    fireEvent.click(doneButtons[0]);
+    await userEvent.click(doneButtons[0]);
 
-    // Check if handle_set_Real_Hours was called with the correct parameters
     expect(mockHandleSetRealHours).toHaveBeenCalledTimes(1);
     expect(mockSetIsHiddenRealHours).toHaveBeenCalledWith(false);
   });
 
-  // Test task deletion functionality
-  test("calls deleteItem when trash button is clicked", () => {
+  test("calls deleteItem when trash button is clicked", async () => {
     render(
       <DashboardTasksTable
         items={mockTasks}
@@ -251,15 +227,12 @@ describe("DashboardTasksTable Component", () => {
       />
     );
 
-    // Find and click the trash button for Task 1
     const trashButtons = screen.getAllByRole("button", { name: "" });
-    fireEvent.click(trashButtons[1]); // The second button is the trash button for the first task
+    await userEvent.click(trashButtons[1]); // Second button is the trash for the first task
 
-    // Check if deleteItem was called with the correct task ID
     expect(mockDeleteItem).toHaveBeenCalledWith(1);
   });
 
-  // Test empty state
   test('displays "All clear" message when there are no tasks', () => {
     render(
       <DashboardTasksTable
@@ -274,5 +247,7 @@ describe("DashboardTasksTable Component", () => {
         setIsHiddenRealHours={mockSetIsHiddenRealHours}
       />
     );
+
+    expect(screen.getByText("All clear")).toBeInTheDocument();
   });
 });

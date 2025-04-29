@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import DashboardInput from "./DashboardInput";
@@ -90,6 +90,8 @@ describe("DashboardInput Component", () => {
       return data;
     });
 
+    const user = userEvent.setup();
+
     // Render the component with required props
     render(
       <DashboardInput
@@ -105,36 +107,23 @@ describe("DashboardInput Component", () => {
     });
 
     // Fill in the form
-    fireEvent.change(screen.getByPlaceholderText("Title"), {
-      target: { value: "New Task" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Description"), {
-      target: { value: "Description for New Task" },
-    });
-    fireEvent.change(screen.getByText("Responsible").closest("select"), {
-      target: { value: "1" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Story Points"), {
-      target: { value: "5" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Hours"), {
-      target: { value: "10" },
-    });
+    await user.type(screen.getByPlaceholderText("Title"), "New Task");
+    await user.type(screen.getByPlaceholderText("Description"), "Description for New Task");
+    await user.selectOptions(screen.getByText("Responsible").closest("select"), "1");
+    await user.type(screen.getByPlaceholderText("Story Points"), "5");
+    await user.type(screen.getByPlaceholderText("Hours"), "10");
 
     // Select the module - this is the key part
     const moduleSelect = screen.getByText("Sprint").closest("select");
-    fireEvent.change(moduleSelect, {
-      target: { value: "1" },
-    });
+    await user.selectOptions(moduleSelect, "1");
 
     // Wait for the component to process the module selection
     await waitFor(() => {
-      // This ensures the component has processed the module selection
       expect(moduleSelect.value).toBe("1");
     });
 
     // Submit the form
-    fireEvent.click(screen.getByText("Add"));
+    await user.click(screen.getByText("Add"));
 
     // Wait for the addItem function to be called
     await waitFor(() => {
@@ -146,12 +135,8 @@ describe("DashboardInput Component", () => {
     console.log("Actual call:", actualCall);
 
     // Check if addItem was called with the correct parameters
-    // Use a more flexible approach that checks each property individually
     expect(actualCall).toHaveProperty("title", "New Task");
-    expect(actualCall).toHaveProperty(
-      "description",
-      "Description for New Task"
-    );
+    expect(actualCall).toHaveProperty("description", "Description for New Task");
     expect(actualCall).toHaveProperty("responsible", "1");
     expect(actualCall).toHaveProperty("story_Points", "5");
     expect(actualCall).toHaveProperty("estimatedTime", "10");
@@ -164,8 +149,17 @@ describe("DashboardInput Component", () => {
     // Mock the addItem function
     const mockAddItem = jest.fn();
 
+    const user = userEvent.setup();
+
     // Render the component
-    render(<DashboardInput addItem={mockAddItem} isInserting={false} />);
+    render(
+      <DashboardInput
+        addItem={mockAddItem}
+        isInserting={true}
+        employeesList={mockEmployees}
+      />
+    );
+      
 
     // Wait for modules to be loaded
     await waitFor(() => {
@@ -173,7 +167,7 @@ describe("DashboardInput Component", () => {
     });
 
     // Submit the form without filling in all required fields
-    fireEvent.click(screen.getByText("Add"));
+    await user.click(screen.getByText("Add"));
 
     // Check if addItem was not called
     expect(mockAddItem).not.toHaveBeenCalled();
@@ -184,8 +178,16 @@ describe("DashboardInput Component", () => {
     // Mock the addItem function
     const mockAddItem = jest.fn();
 
+    const user = userEvent.setup();
+
     // Render the component with isInserting set to true
-    render(<DashboardInput addItem={mockAddItem} isInserting={true} />);
+    render(
+      <DashboardInput
+        addItem={mockAddItem}
+        isInserting={true}
+        employeesList={mockEmployees}
+      />
+    );
 
     // Wait for modules to be loaded
     await waitFor(() => {
@@ -193,29 +195,18 @@ describe("DashboardInput Component", () => {
     });
 
     // Fill in the form
-    fireEvent.change(screen.getByPlaceholderText("Title"), {
-      target: { value: "New Task" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Description"), {
-      target: { value: "Description for New Task" },
-    });
-    fireEvent.change(screen.getByText("Responsible").closest("select"), {
-      target: { value: "1" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Story Points"), {
-      target: { value: "5" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Hours"), {
-      target: { value: "10" },
-    });
-    fireEvent.change(screen.getByText("Sprint").closest("select"), {
-      target: { value: "1" },
-    });
+    await user.type(screen.getByPlaceholderText("Title"), "New Task");
+    await user.type(screen.getByPlaceholderText("Description"), "Description for New Task");
+    await user.selectOptions(screen.getByText("Responsible").closest("select"), "1");
+    await user.type(screen.getByPlaceholderText("Story Points"), "5");
+    await user.type(screen.getByPlaceholderText("Hours"), "10");
+    await user.selectOptions(screen.getByText("Sprint").closest("select"), "1");
 
     // Submit the form
-    fireEvent.click(screen.getByText("Add"));
+    await user.click(screen.getByText("Add"));
 
     // Check if addItem was not called
     expect(mockAddItem).not.toHaveBeenCalled();
   });
 });
+
