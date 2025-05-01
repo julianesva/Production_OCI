@@ -13,7 +13,7 @@ export default function DashboardTasksTable({
   deleteItem,
   setIsHiddenRealHours,
 }) {
-  const [isHidden, setIsHidden] = useState(false);
+   [isHidden, setIsHidden] = useState(false
 
   function handleNextButton(event, task) {
     if (task.done == 0) {
