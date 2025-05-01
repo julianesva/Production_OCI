@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git commit" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+#
+# To enable this hook, rename this file to "pre-commit".
+
+cd MtdrSpring/backend
+
+# Run ESLint on frontend
+cd src/main/frontend
+npx eslint 
+if [ $? -ne 0 ]; then
+  echo "ESLint check failed."
+fi
+cd ../../..
+
+# Run Prettier check on frontend (use --check to avoid modifying files)
+npx prettier --check "src/main/frontend/src/**/*.{js,jsx,ts,tsx,css,html,json}"
+if [ $? -ne 0 ]; then
+  echo "Prettier check failed. Please run 'npx prettier --write .' to fix formatting."
+fi
+
+mvn spotless:check
+if [ $? -ne 0 ]; then
+  echo "Spotless formatting check failed. Run 'mvn spotless:apply' to fix."
+  exit 1
+fi
+
+mvn checkstyle:check
+if [ $? -ne 0 ]; then
+  echo "Checkstyle failed. Please fix code style violations."
+fi
