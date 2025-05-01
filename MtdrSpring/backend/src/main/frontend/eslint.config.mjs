@@ -1,5 +1,6 @@
 import globals from "globals";
 import { defineConfig } from "eslint/config";
+import parser from "@babel/eslint-parser";
 
 const safeBrowserGlobals = {
   ...globals.browser,
@@ -11,16 +12,25 @@ export default defineConfig([
   {
     files: ["**/*.{js,mjs,cjs,jsx}"],
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
+      parser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        requireConfigFile: false,
+        babelOptions: {
+          presets: ["@babel/preset-react"],
+        },
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
       globals: safeBrowserGlobals,
     },
     rules: {
-      // Solo errores críticos (sintaxis o problemas de ejecución)
       "no-undef": "warn",
       "no-unexpected-multiline": "warn",
       "no-unreachable": "warn",
-      "no-unused-vars": "warn", // puedes cambiar a "off"
+      "no-unused-vars": "warn",
       "no-empty": "warn",
     },
   },
