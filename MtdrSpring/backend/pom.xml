@@ -19,8 +19,21 @@
 		<frontend-src-dir>${project.basedir}/src/main/frontend</frontend-src-dir>
 		<node.version>v16.13.2</node.version>
 		<npm.version>8.1.2</npm.version>
+		<skip.frontend>false</skip.frontend>
 	</properties>
+	
+	<!-- Add profiles section -->
+	<profiles>
+		<profile>
+			<id>skip-frontend</id>
+			<properties>
+				<skip.frontend>true</skip.frontend>
+			</properties>
+		</profile>
+	</profiles>
+	
 	<dependencies>
+		<!-- Dependencies remain unchanged -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -75,7 +88,7 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<!-- Keeps frontend and backend separate. -->
+			<!-- Modified frontend-maven-plugin with skip configuration -->
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
@@ -85,7 +98,7 @@
 					<npmVersion>${npm.version}</npmVersion>
 					<workingDirectory>${frontend-src-dir}</workingDirectory>
 					<installDirectory>${project.build.directory}</installDirectory>
-					<downloadRoot></downloadRoot>
+					<skip>${skip.frontend}</skip>
 				</configuration>
 				<executions>
 					<execution>
@@ -111,6 +124,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- Modified resources plugin with skip configuration -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -130,6 +144,7 @@
 									<filtering>false</filtering>
 								</resource>
 							</resources>
+							<skip>${skip.frontend}</skip>
 						</configuration>
 					</execution>
 				</executions>
