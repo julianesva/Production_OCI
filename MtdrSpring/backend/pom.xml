@@ -33,7 +33,7 @@
 	</profiles>
 	
 	<dependencies>
-		<!-- Dependencies remain unchanged -->
+		<!-- Existing dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -42,6 +42,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		
+		<!-- Add WebFlux dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-core</artifactId>
+		</dependency>
+		
+		<!-- Other existing dependencies -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
@@ -86,9 +98,11 @@
 			<version>6.5.0</version>
 		</dependency>		
 	</dependencies>
+	
+	<!-- Rest of the build section remains the same -->
 	<build>
 		<plugins>
-			<!-- Modified frontend-maven-plugin with skip configuration -->
+			<!-- Frontend Maven Plugin -->
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
@@ -124,7 +138,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Modified resources plugin with skip configuration -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
