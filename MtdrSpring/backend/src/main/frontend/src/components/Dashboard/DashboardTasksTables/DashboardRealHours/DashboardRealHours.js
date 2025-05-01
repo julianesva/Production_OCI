@@ -2,7 +2,7 @@ import './DashboardRealHours.css';
 import { useState } from 'react';
 
 export default function DashboardRealHours({ isHidden, confirm_Real_Hours }) {
-    const [realHours, setRealHours] = useState(0);
+    const [realHours, setRealHours] = useState(0
 
     const handleConfirm = () => {
         const hours = parseFloat(realHours);
