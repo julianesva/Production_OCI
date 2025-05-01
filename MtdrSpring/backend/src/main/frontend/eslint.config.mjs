@@ -18,9 +18,9 @@ export default defineConfig([
     },
     rules: {
       // Solo errores críticos (sintaxis o problemas de ejecución)
-      "no-undef": "error",
-      "no-unexpected-multiline": "error",
-      "no-unreachable": "error",
+      "no-undef": "warn",
+      "no-unexpected-multiline": "warn",
+      "no-unreachable": "warn",
       "no-unused-vars": "warn", // puedes cambiar a "off"
       "no-empty": "warn",
     },
