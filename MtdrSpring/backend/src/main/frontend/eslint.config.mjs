@@ -1,5 +1,5 @@
 import globals from "globals";
-import defineConfig from "@eslint/eslintrc"; // Importación modificada
+import { defineConfig } from "eslint/config";
 import babelParser from "@babel/eslint-parser";
 
 // Fix del bug de AudioWorkletGlobalScope con espacio
