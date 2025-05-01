@@ -1,13 +1,31 @@
-// eslint.config.mjs
-import js from '@eslint/js'
+import globals from "globals";
+import { defineConfig } from "eslint/config";
 
-export default [
-  js.configs.recommended,
+// Fix del bug de AudioWorkletGlobalScope con espacio
+const safeBrowserGlobals = {
+  ...globals.browser,
+  AudioWorkletGlobalScope: globals.browser["AudioWorkletGlobalScope "],
+};
+delete safeBrowserGlobals["AudioWorkletGlobalScope "];
+
+export default defineConfig([
   {
-    files: ['**/*.js'],
+    files: ["**/*.{js,mjs,cjs,jsx}"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: safeBrowserGlobals,
+    },
     rules: {
-      semi: ['error', 'always'],
-      quotes: ['error', 'single'],
+      // Solo errores críticos (sintaxis o problemas de ejecución)
+      "no-undef": "error",
+      "no-unexpected-multiline": "error",
+      "no-unreachable": "error",
+      "no-unused-vars": "warn", // puedes cambiar a "off"
+      "no-empty": "warn",
     },
   },
-];
+]);
+
+
+
