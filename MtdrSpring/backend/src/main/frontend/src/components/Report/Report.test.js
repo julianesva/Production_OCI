@@ -225,43 +225,40 @@ describe("Report Component", () => {
     expect(screen.getByText("Generate Report")).toBeInTheDocument();
   });
 
+
   test("generates KPI report for team by sprint", async () => {
     render(<Report />);
     const user = userEvent.setup();
-
+  
     // Wait for loading to complete AND for the team options to be present
     await waitFor(() => {
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-      expect(
-        screen.getByRole("option", { name: "Team A" })
-      ).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "Team A" })).toBeInTheDocument();
     });
-
+  
     // Select team
     const teamSelect = screen
       .getByText("Team:")
       .closest("div")
       .querySelector("select");
     await user.selectOptions(teamSelect, "Team A");
-
+  
     // Wait for the sprint options to be present
     await waitFor(() => {
-      expect(
-        screen.getByRole("option", { name: "1 - Sprint 1" })
-      ).toBeInTheDocument(); // Assuming your module data renders "Sprint 1" as text
+      expect(screen.getByRole("option", { name: "1 - Sprint 1" })).toBeInTheDocument(); // Assuming your module data renders "Sprint 1" as text
     });
-
+  
     // Select sprint
     const sprintSelect = screen
       .getByText("Sprint:")
       .closest("div")
       .querySelector("select");
     await user.selectOptions(sprintSelect, "1"); // Assuming the value is "1"
-
+  
     // Click generate report button
     const generateButton = screen.getByText("Generate Report");
     await user.click(generateButton);
-
+  
     // Wait for KPI data to be displayed
     await waitFor(() => {
       expect(screen.getByText("Tasks")).toBeInTheDocument();
@@ -271,32 +268,21 @@ describe("Report Component", () => {
       expect(screen.getByText("Tasks per Hour")).toBeInTheDocument();
       expect(screen.getByTestId("kpi-combined")).toBeInTheDocument();
     });
-
+  
     // Verify the KPI data for Team A in Sprint 1
     const tasksKPIContainer = screen.getByTestId("kpi-tasks");
-    expect(
-      within(tasksKPIContainer).getByText("Tasks To Do: 1")
-    ).toBeInTheDocument();
-    expect(
-      within(tasksKPIContainer).getByText("Tasks Completed: 2")
-    ).toBeInTheDocument();
-
+    expect(within(tasksKPIContainer).getByText("Tasks To Do: 1")).toBeInTheDocument();
+    expect(within(tasksKPIContainer).getByText("Tasks Completed: 2")).toBeInTheDocument();
+  
     const hoursKPIContainer = screen.getByTestId("kpi-hours");
-    expect(
-      within(hoursKPIContainer).getByText("Estimated Hours: 9")
-    ).toBeInTheDocument();
-    expect(
-      within(hoursKPIContainer).getByText("Worked Hours: 11")
-    ).toBeInTheDocument();
-
+    expect(within(hoursKPIContainer).getByText("Estimated Hours: 9")).toBeInTheDocument();
+    expect(within(hoursKPIContainer).getByText("Worked Hours: 11")).toBeInTheDocument();
+  
     const combinedKPIContainer = screen.getByTestId("kpi-combined");
-    expect(
-      within(combinedKPIContainer).getByText("Tasks Completed: 2")
-    ).toBeInTheDocument();
-    expect(
-      within(combinedKPIContainer).getByText("Worked Hours: 11")
-    ).toBeInTheDocument();
+    expect(within(combinedKPIContainer).getByText("Tasks Completed: 2")).toBeInTheDocument();
+    expect(within(combinedKPIContainer).getByText("Worked Hours: 11")).toBeInTheDocument();
   });
+
 
   test("generates KPI report for person by sprint", async () => {
     render(<Report />);
@@ -313,21 +299,21 @@ describe("Report Component", () => {
       .getByText("Team:")
       .closest("div")
       .querySelector("select");
-    await user.selectOptions(teamSelect, "Team A");
+      await user.selectOptions(teamSelect, "Team A");
 
     // Select member
     const memberSelect = screen
       .getByText("Member:")
       .closest("div")
       .querySelector("select");
-    await user.selectOptions(memberSelect, "user1");
+      await user.selectOptions(memberSelect, "user1");
 
     // Select sprint
     const sprintSelect = screen
       .getByText("Sprint:")
       .closest("div")
       .querySelector("select");
-    await user.selectOptions(sprintSelect, "1");
+      await user.selectOptions(sprintSelect, "1");
 
     // Click generate report button
     const generateButton = screen.getByText("Generate Report");
@@ -338,30 +324,18 @@ describe("Report Component", () => {
 
     // Check tasks KPI
     const tasksKPIContainer = screen.getByTestId("kpi-tasks");
-    expect(
-      within(tasksKPIContainer).getByText("Tasks To Do: 1")
-    ).toBeInTheDocument();
-    expect(
-      within(tasksKPIContainer).getByText("Tasks Completed: 1")
-    ).toBeInTheDocument();
+    expect(within(tasksKPIContainer).getByText("Tasks To Do: 1")).toBeInTheDocument();
+    expect(within(tasksKPIContainer).getByText("Tasks Completed: 1")).toBeInTheDocument();
 
     // Check hours KPI
     const hoursKPIContainer = screen.getByTestId("kpi-hours");
-    expect(
-      within(hoursKPIContainer).getByText("Estimated Hours: 5")
-    ).toBeInTheDocument();
-    expect(
-      within(hoursKPIContainer).getByText("Worked Hours: 6")
-    ).toBeInTheDocument();
+    expect(within(hoursKPIContainer).getByText("Estimated Hours: 5")).toBeInTheDocument();
+    expect(within(hoursKPIContainer).getByText("Worked Hours: 6")).toBeInTheDocument();
 
     // Check combined KPI
     const combinedKPIContainer = screen.getByTestId("kpi-combined");
-    expect(
-      within(combinedKPIContainer).getByText("Tasks Completed: 1")
-    ).toBeInTheDocument();
-    expect(
-      within(combinedKPIContainer).getByText("Worked Hours: 6")
-    ).toBeInTheDocument();
+    expect(within(combinedKPIContainer).getByText("Tasks Completed: 1")).toBeInTheDocument();
+    expect(within(combinedKPIContainer).getByText("Worked Hours: 6")).toBeInTheDocument();
   });
 
   // Test error handling
@@ -380,4 +354,5 @@ describe("Report Component", () => {
       expect(screen.getByText(/Error:/)).toBeInTheDocument();
     });
   });
+
 });

@@ -69,7 +69,7 @@ export default function ReportContent({ data, moduleData }) {
                             .sort((a, b) => a.id - b.id)
                             .map((module) => (
                                 <option key={module.id} value={module.id}>
-                                    {module.id} - {module.title}
+                                    {module.id} - {module.name}
                                 </option>
                             ))
                     }

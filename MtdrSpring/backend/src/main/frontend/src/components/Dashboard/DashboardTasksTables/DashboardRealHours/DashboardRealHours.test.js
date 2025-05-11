@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import DashboardRealHours from "./DashboardRealHours";
@@ -38,7 +38,9 @@ describe("DashboardRealHours Component", () => {
   });
 
   // Test input field functionality
-  test("updates input value when user types", () => {
+  test("updates input value when user types", async () => {
+    const user = userEvent.setup();
+    
     render(
       <DashboardRealHours
         isHidden={mockIsHidden}
@@ -50,14 +52,16 @@ describe("DashboardRealHours Component", () => {
     const input = screen.getByPlaceholderText("Real Hours");
 
     // Type a value
-    userEvent.type(input, "5");
+    await user.type(input, "5");
 
     // Check if the input value is updated
-    expect(input.value).toBe("05");
+    expect(input.value).toBe("5");
   });
 
   // Test cancel button functionality
-  test("calls isHidden when cancel button is clicked", () => {
+  test("calls isHidden when cancel button is clicked", async () => {
+    const user = userEvent.setup();
+    
     render(
       <DashboardRealHours
         isHidden={mockIsHidden}
@@ -69,14 +73,16 @@ describe("DashboardRealHours Component", () => {
     const cancelButton = screen.getByText("Cancel");
 
     // Click the cancel button
-    fireEvent.click(cancelButton);
+    await user.click(cancelButton);
 
     // Check if isHidden was called with true
     expect(mockIsHidden).toHaveBeenCalledWith(true);
   });
 
   // Test save button functionality
-  test("calls confirm_Real_Hours when save button is clicked", () => {
+  test("calls confirm_Real_Hours when save button is clicked", async () => {
+    const user = userEvent.setup();
+    
     render(
       <DashboardRealHours
         isHidden={mockIsHidden}
@@ -89,17 +95,19 @@ describe("DashboardRealHours Component", () => {
     const saveButton = screen.getByText("Save");
 
     // Type a value
-    userEvent.type(input, "5");
+    await user.type(input, "5");
 
     // Click the save button
-    fireEvent.click(saveButton);
+    await user.click(saveButton);
 
     // Check if confirm_Real_Hours was called with the input value
-    expect(mockConfirmRealHours).toHaveBeenCalledWith("05");
+    expect(mockConfirmRealHours).toHaveBeenCalledWith("5");
   });
 
   // Test enter key functionality
-  test("calls confirm_Real_Hours when enter key is pressed", () => {
+  test("calls confirm_Real_Hours when enter key is pressed", async () => {
+    const user = userEvent.setup();
+    
     render(
       <DashboardRealHours
         isHidden={mockIsHidden}
@@ -111,10 +119,10 @@ describe("DashboardRealHours Component", () => {
     const input = screen.getByPlaceholderText("Real Hours");
 
     // Type a value and press enter
-    userEvent.type(input, "5{enter}");
+    await user.type(input, "5{enter}");
 
     // Check if confirm_Real_Hours was called with the input value
-    expect(mockConfirmRealHours).toHaveBeenCalledWith("05");
+    expect(mockConfirmRealHours).toHaveBeenCalledWith("5");
   });
 
   // Test initial state

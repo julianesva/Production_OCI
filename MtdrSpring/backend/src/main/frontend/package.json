@@ -10,6 +10,7 @@
     "@mui/material": "^5.8.0",
     "@mui/styles": "^5.7.0",
     "@tabler/icons-react": "^3.31.0",
+    "faker": "^6.6.6",
     "moment": "^2.29.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -34,9 +35,22 @@
   "homepage": ".",
   "proxy": "https://39cc-200-36-253-104.ngrok-free.app",
   "devDependencies": {
+    "@babel/preset-react": "^7.26.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^12.1.5",
     "@testing-library/user-event": "^14.6.1",
+<<<<<<< HEAD
     "msw": "^1.3.2"
+=======
+    "eslint": "^8.57.1",
+    "msw": "^1.3.2",
+    "prettier": "^3.5.3"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ]
+>>>>>>> 64561f2da50cca045708af3d65cd117f01fd7912
   }
 }

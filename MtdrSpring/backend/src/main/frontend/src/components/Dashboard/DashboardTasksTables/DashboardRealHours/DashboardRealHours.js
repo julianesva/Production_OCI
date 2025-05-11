@@ -4,6 +4,17 @@ import { useState } from 'react';
 export default function DashboardRealHours({ isHidden, confirm_Real_Hours }) {
     const [realHours, setRealHours] = useState(0);
 
+    const handleConfirm = () => {
+        const hours = parseFloat(realHours);
+        if (isNaN(hours) || hours <= 0) {
+            // Optionally display an error message to the user
+            console.error("Please enter a positive number for real hours.");
+            return; // Prevent confirm_Real_Hours from being called
+        }
+        confirm_Real_Hours(realHours);
+        isHidden(true);
+    };
+
     return (
         <div className='dashboard-real-hours-main-container'>
             <div className='dashboard-real-hours-center-container'>
@@ -48,7 +59,8 @@ export default function DashboardRealHours({ isHidden, confirm_Real_Hours }) {
                         <button
                             className='dashboard-real-hours-button-save'
                             onClick={() => {
-                                confirm_Real_Hours(realHours);
+                                isHidden(false);
+                                handleConfirm();
                             }}
                         >
                             Save

@@ -415,4 +415,4 @@ describe("DashboardContent Component", () => {
       })
     );
   });
-});
+})
