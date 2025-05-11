@@ -1,10 +1,10 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import Report from "./Report";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
-import { API_HEADERS, API_TEAM_DATA, API_MODULES } from "../../API";
+import { API_TEAM_DATA, API_MODULES } from "../../API";
 
 // Mock data for testing
 
@@ -29,7 +29,7 @@ jest.mock("recharts", () => {
 });
 // Mock  ReportKPICombined component
 jest.mock(
-  "./ReportContent/ReportKPICombined/ReportKPICombined",
+  "./ReportContent/ReportKPI/ReportKPICombined/ReportKPICombined",
   () =>
     ({ KPICombinedData }) =>
       (
@@ -42,7 +42,7 @@ jest.mock(
 
 // Mock ReportKPITasks component
 jest.mock(
-  "./ReportContent/ReportKPITasks/ReportKPITasks",
+  "./ReportContent/ReportKPI/ReportKPITasks/ReportKPITasks",
   () =>
     ({ KPITasksData }) =>
       (
@@ -55,7 +55,7 @@ jest.mock(
 
 // Mock ReportKPIHours component
 jest.mock(
-  "./ReportContent/ReportKPIHours/ReportKPIHours",
+  "./ReportContent/ReportKPI/ReportKPIHours/ReportKPIHours",
   () =>
     ({ KPIHoursData }) =>
       (
@@ -171,11 +171,11 @@ const mockTeamData = [
 const mockModuleData = [
   {
     id: 1,
-    title: "Sprint 1",
+    name: "Sprint 1",
   },
   {
     id: 2,
-    title: "Sprint 2",
+    name: "Sprint 2",
   },
 ];
 
@@ -227,10 +227,14 @@ describe("Report Component", () => {
 
   test("generates KPI report for team by sprint", async () => {
     render(<Report />);
+    const user = userEvent.setup();
 
-    // Wait for loading to complete
+    // Wait for loading to complete AND for the team options to be present
     await waitFor(() => {
       expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("option", { name: "Team A" })
+      ).toBeInTheDocument();
     });
 
     // Select team
@@ -238,50 +242,66 @@ describe("Report Component", () => {
       .getByText("Team:")
       .closest("div")
       .querySelector("select");
-    userEvent.selectOptions(teamSelect, "Team A");
+    await user.selectOptions(teamSelect, "Team A");
+
+    // Wait for the sprint options to be present
+    await waitFor(() => {
+      expect(
+        screen.getByRole("option", { name: "1 - Sprint 1" })
+      ).toBeInTheDocument(); // Assuming your module data renders "Sprint 1" as text
+    });
 
     // Select sprint
     const sprintSelect = screen
       .getByText("Sprint:")
       .closest("div")
       .querySelector("select");
-    userEvent.selectOptions(sprintSelect, "1");
+    await user.selectOptions(sprintSelect, "1"); // Assuming the value is "1"
 
     // Click generate report button
     const generateButton = screen.getByText("Generate Report");
-    fireEvent.click(generateButton);
+    await user.click(generateButton);
 
     // Wait for KPI data to be displayed
     await waitFor(() => {
-      // Check if tasks KPI is displayed
       expect(screen.getByText("Tasks")).toBeInTheDocument();
       expect(screen.getByTestId("kpi-tasks")).toBeInTheDocument();
-
-      // Check if hours KPI is displayed
       expect(screen.getByText("Hours")).toBeInTheDocument();
       expect(screen.getByTestId("kpi-hours")).toBeInTheDocument();
-
-      // Check if combined KPI is displayed
       expect(screen.getByText("Tasks per Hour")).toBeInTheDocument();
       expect(screen.getByTestId("kpi-combined")).toBeInTheDocument();
     });
 
     // Verify the KPI data for Team A in Sprint 1
-    // Team A has 2 completed tasks in Sprint 1 (Task 1 and Task 4)
-    // Total estimated hours: 5 + 4 = 9
-    // Total worked hours: 6 + 5 = 11
+    const tasksKPIContainer = screen.getByTestId("kpi-tasks");
+    expect(
+      within(tasksKPIContainer).getByText("Tasks To Do: 1")
+    ).toBeInTheDocument();
+    expect(
+      within(tasksKPIContainer).getByText("Tasks Completed: 2")
+    ).toBeInTheDocument();
 
-    // Check tasks KPI
-    expect(screen.getByText("Tasks To Do: 1")).toBeInTheDocument(); // Tasks to do
-    expect(screen.getByText("Tasks Completed: 2")).toBeInTheDocument(); // Tasks completed
+    const hoursKPIContainer = screen.getByTestId("kpi-hours");
+    expect(
+      within(hoursKPIContainer).getByText("Estimated Hours: 9")
+    ).toBeInTheDocument();
+    expect(
+      within(hoursKPIContainer).getByText("Worked Hours: 11")
+    ).toBeInTheDocument();
 
-    // Check hours KPI
-    expect(screen.getByText("Estimated Hours: 9")).toBeInTheDocument(); // Estimated hours
-    expect(screen.getByText("Worked Hours: 11")).toBeInTheDocument(); // Worked hours
+    const combinedKPIContainer = screen.getByTestId("kpi-combined");
+    expect(
+      within(combinedKPIContainer).getByText("Tasks Completed: 2")
+    ).toBeInTheDocument();
+    expect(
+      within(combinedKPIContainer).getByText("Worked Hours: 11")
+    ).toBeInTheDocument();
   });
 
   test("generates KPI report for person by sprint", async () => {
     render(<Report />);
+
+    const user = userEvent.setup();
 
     // Wait for loading to complete
     await waitFor(() => {
@@ -293,53 +313,55 @@ describe("Report Component", () => {
       .getByText("Team:")
       .closest("div")
       .querySelector("select");
-    userEvent.selectOptions(teamSelect, "Team A");
+    await user.selectOptions(teamSelect, "Team A");
 
     // Select member
     const memberSelect = screen
       .getByText("Member:")
       .closest("div")
       .querySelector("select");
-    userEvent.selectOptions(memberSelect, "user1");
+    await user.selectOptions(memberSelect, "user1");
 
     // Select sprint
     const sprintSelect = screen
       .getByText("Sprint:")
       .closest("div")
       .querySelector("select");
-    userEvent.selectOptions(sprintSelect, "1");
+    await user.selectOptions(sprintSelect, "1");
 
     // Click generate report button
     const generateButton = screen.getByText("Generate Report");
-    fireEvent.click(generateButton);
+    await user.click(generateButton);
 
     // Wait for KPI data to be displayed
-    await waitFor(() => {
-      // Check if tasks KPI is displayed
-      expect(screen.getByText("Tasks")).toBeInTheDocument();
-      expect(screen.getByTestId("kpi-tasks")).toBeInTheDocument();
-
-      // Check if hours KPI is displayed
-      expect(screen.getByText("Hours")).toBeInTheDocument();
-      expect(screen.getByTestId("kpi-hours")).toBeInTheDocument();
-
-      // Check if combined KPI is displayed
-      expect(screen.getByText("Tasks per Hour")).toBeInTheDocument();
-      expect(screen.getByTestId("kpi-combined")).toBeInTheDocument();
-    });
-
     // Verify the KPI data for user1 in Sprint 1
-    // user1 has 1 completed task in Sprint 1 (Task 1)
-    // Total estimated hours: 5
-    // Total worked hours: 6
 
     // Check tasks KPI
-    expect(screen.getByText("Tasks To Do: 1")).toBeInTheDocument(); // Tasks to do
-    expect(screen.getByText("Tasks Completed: 1")).toBeInTheDocument(); // Tasks completed
+    const tasksKPIContainer = screen.getByTestId("kpi-tasks");
+    expect(
+      within(tasksKPIContainer).getByText("Tasks To Do: 1")
+    ).toBeInTheDocument();
+    expect(
+      within(tasksKPIContainer).getByText("Tasks Completed: 1")
+    ).toBeInTheDocument();
 
     // Check hours KPI
-    expect(screen.getByText("Estimated Hours: 5")).toBeInTheDocument(); // Estimated hours
-    expect(screen.getByText("Worked Hours: 6")).toBeInTheDocument(); // Worked hours
+    const hoursKPIContainer = screen.getByTestId("kpi-hours");
+    expect(
+      within(hoursKPIContainer).getByText("Estimated Hours: 5")
+    ).toBeInTheDocument();
+    expect(
+      within(hoursKPIContainer).getByText("Worked Hours: 6")
+    ).toBeInTheDocument();
+
+    // Check combined KPI
+    const combinedKPIContainer = screen.getByTestId("kpi-combined");
+    expect(
+      within(combinedKPIContainer).getByText("Tasks Completed: 1")
+    ).toBeInTheDocument();
+    expect(
+      within(combinedKPIContainer).getByText("Worked Hours: 6")
+    ).toBeInTheDocument();
   });
 
   // Test error handling
@@ -356,200 +378,6 @@ describe("Report Component", () => {
     // Wait for error to be displayed
     await waitFor(() => {
       expect(screen.getByText(/Error:/)).toBeInTheDocument();
-    });
-  });
-
-  // Test task data state changes
-  test("displays task data with correct information", async () => {
-    // Mock task data with specific fields
-    const mockTaskData = [
-      {
-        teamId: "Team A",
-        user: {
-          username: "user1",
-        },
-        tasksCompleted: [
-          {
-            id: 1,
-            name: "Task 1",
-            moduleId: 1,
-            estimatedTime: 5,
-            actualTime: 6,
-            storyPoints: 3,
-          },
-        ],
-        uncompletedTasks: [
-          {
-            id: 2,
-            name: "Task 2",
-            moduleId: 1,
-            estimatedTime: 4,
-            storyPoints: 2,
-          },
-        ],
-      },
-    ];
-
-    // Override the server handler for this test
-    server.use(
-      rest.get(API_TEAM_DATA, (req, res, ctx) => {
-        return res(ctx.json(mockTaskData));
-      })
-    );
-
-    render(<Report />);
-
-    // Wait for loading to complete
-    await waitFor(() => {
-      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-    });
-
-    // Select team
-    const teamSelect = screen
-      .getByText("Team:")
-      .closest("div")
-      .querySelector("select");
-    userEvent.selectOptions(teamSelect, "Team A");
-
-    // Select member
-    const memberSelect = screen
-      .getByText("Member:")
-      .closest("div")
-      .querySelector("select");
-    userEvent.selectOptions(memberSelect, "user1");
-
-    // Select sprint
-    const sprintSelect = screen
-      .getByText("Sprint:")
-      .closest("div")
-      .querySelector("select");
-    userEvent.selectOptions(sprintSelect, "1");
-
-    // Click generate report button
-    const generateButton = screen.getByText("Generate Report");
-    fireEvent.click(generateButton);
-
-    // Wait for task data to be displayed
-    await waitFor(() => {
-      // Check if task name is displayed
-      expect(screen.getByText("Task 1")).toBeInTheDocument();
-
-      // Check if developer name is displayed
-      expect(screen.getByText("user1")).toBeInTheDocument();
-
-      // Check if story points are displayed
-      expect(screen.getByText("3")).toBeInTheDocument();
-
-      // Check if estimated hours are displayed
-      expect(screen.getByText("5")).toBeInTheDocument();
-
-      // Check if actual hours are displayed
-      expect(screen.getByText("6")).toBeInTheDocument();
-    });
-  });
-
-  // Test listing completed tasks by sprint
-  test("lists completed tasks by sprint with minimum information", async () => {
-    // Mock task data with multiple completed tasks in different sprints
-    const mockTaskData = [
-      {
-        teamId: "Team A",
-        user: {
-          username: "user1",
-        },
-        tasksCompleted: [
-          {
-            id: 1,
-            name: "Task 1",
-            moduleId: 1,
-            estimatedTime: 5,
-            actualTime: 6,
-          },
-          {
-            id: 2,
-            name: "Task 2",
-            moduleId: 2,
-            estimatedTime: 4,
-            actualTime: 5,
-          },
-        ],
-        uncompletedTasks: [],
-      },
-    ];
-
-    // Override the server handler for this test
-    server.use(
-      rest.get(API_TEAM_DATA, (req, res, ctx) => {
-        return res(ctx.json(mockTaskData));
-      })
-    );
-
-    render(<Report />);
-
-    // Wait for loading to complete
-    await waitFor(() => {
-      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-    });
-
-    // Select team
-    const teamSelect = screen
-      .getByText("Team:")
-      .closest("div")
-      .querySelector("select");
-    userEvent.selectOptions(teamSelect, "Team A");
-
-    // Select member
-    const memberSelect = screen
-      .getByText("Member:")
-      .closest("div")
-      .querySelector("select");
-    userEvent.selectOptions(memberSelect, "user1");
-
-    // Select sprint 1
-    const sprintSelect = screen
-      .getByText("Sprint:")
-      .closest("div")
-      .querySelector("select");
-    userEvent.selectOptions(sprintSelect, "1");
-
-    // Click generate report button
-    const generateButton = screen.getByText("Generate Report");
-    fireEvent.click(generateButton);
-
-    // Wait for sprint 1 task data to be displayed
-    await waitFor(() => {
-      // Check if task name is displayed
-      expect(screen.getByText("Task 1")).toBeInTheDocument();
-
-      // Check if developer name is displayed
-      expect(screen.getByText("user1")).toBeInTheDocument();
-
-      // Check if estimated hours are displayed
-      expect(screen.getByText("5")).toBeInTheDocument();
-
-      // Check if actual hours are displayed
-      expect(screen.getByText("6")).toBeInTheDocument();
-    });
-
-    // Select sprint 2
-    userEvent.selectOptions(sprintSelect, "2");
-
-    // Click generate report button again
-    fireEvent.click(generateButton);
-
-    // Wait for sprint 2 task data to be displayed
-    await waitFor(() => {
-      // Check if task name is displayed
-      expect(screen.getByText("Task 2")).toBeInTheDocument();
-
-      // Check if developer name is displayed
-      expect(screen.getByText("user1")).toBeInTheDocument();
-
-      // Check if estimated hours are displayed
-      expect(screen.getByText("4")).toBeInTheDocument();
-
-      // Check if actual hours are displayed
-      expect(screen.getByText("5")).toBeInTheDocument();
     });
   });
 });

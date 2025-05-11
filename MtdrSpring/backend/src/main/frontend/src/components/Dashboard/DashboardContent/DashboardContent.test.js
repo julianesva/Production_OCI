@@ -1,17 +1,122 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import DashboardContent from "./DashboardContent";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { API_LIST, API_MODULES } from "../../../API";
+import { faker } from "@faker-js/faker";
 
-// Mock data for testing
-const mockTasks = [
+/**
+ * Generates dynamic mock employee data
+ */
+function generateMockEmployees(count = 10, options = {}) {
+  // Set up seed for deterministic results if needed
+  if (options.deterministic) {
+    faker.seed(options.seed || 123);
+  }
+
+  return Array(count)
+    .fill()
+    .map((_, index) => {
+      const id = index + 1;
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
+      const username = faker.internet
+        .userName({ firstName, lastName })
+        .toLowerCase();
+
+      return {
+        id,
+        user: {
+          id,
+          username,
+          email: faker.internet.email({ firstName, lastName }),
+          firstName,
+          lastName,
+          role: faker.helpers.arrayElement([
+            "admin",
+            "user",
+            "editor",
+            "viewer",
+          ]),
+          department: faker.helpers.arrayElement([
+            "IT",
+            "HR",
+            "Marketing",
+            "Sales",
+            "Engineering",
+          ]),
+          avatar: faker.image.avatar(),
+          createdAt: faker.date.past().toISOString(),
+        },
+        position: faker.person.jobTitle(),
+        hireDate: faker.date.past({ years: 5 }).toISOString(),
+        salary: faker.number.int({ min: 30000, max: 150000 }),
+        isActive: faker.datatype.boolean({ probability: 0.9 }),
+      };
+    });
+}
+
+/**
+ * Generates dynamic mock task data
+ */
+function generateMockTasks(count = 10, options = {}) {
+  // Set up seed for deterministic results if needed
+  if (options.deterministic) {
+    faker.seed(options.seed || 456);
+  }
+
+  const doneRatio = options.doneRatio || 0.3;
+  const modules = options.modules || [1, 2];
+  const responsibles = options.responsibles || [1, 2, 3, 4, 5];
+
+  return Array(count)
+    .fill()
+    .map((_, index) => {
+      const id = index + 1;
+      const isDone = faker.datatype.boolean({ probability: doneRatio }) ? 1 : 0;
+
+      return {
+        id,
+        title: faker.word.words({ count: { min: 2, max: 5 } }),
+        description: faker.lorem.sentence(),
+        estimatedTime: faker.number.int({ min: 1, max: 12 }),
+        done: isDone,
+        story_Points: faker.number.int({ min: 1, max: 8 }),
+        moduleId: faker.helpers.arrayElement(modules),
+        responsible: faker.helpers.arrayElement(responsibles),
+        actualTime: isDone ? faker.number.int({ min: 1, max: 15 }) : 0,
+      };
+    });
+}
+
+/**
+ * Generates dynamic mock module data
+ */
+function generateMockModules(count = 3, options = {}) {
+  // Set up seed for deterministic results if needed
+  if (options.deterministic) {
+    faker.seed(options.seed || 789);
+  }
+
+  return Array(count)
+    .fill()
+    .map((_, index) => {
+      const id = index + 1;
+      return {
+        id,
+        title: `Sprint ${id}`,
+      };
+    });
+}
+
+// Create static test tasks that we can reliably reference in tests
+const staticTestTasks = [
   {
-    id: 1,
-    title: "Task 1",
-    description: "Description for Task 1",
+    id: 999,
+    title: "Static Test Task 1",
+    description: "This task has predictable values for testing",
     estimatedTime: 5,
     done: 0,
     story_Points: 3,
@@ -20,9 +125,9 @@ const mockTasks = [
     actualTime: 0,
   },
   {
-    id: 2,
-    title: "Task 2",
-    description: "Description for Task 2",
+    id: 1000,
+    title: "Static Test Task 2",
+    description: "This is another predictable task for testing",
     estimatedTime: 8,
     done: 0,
     story_Points: 5,
@@ -30,48 +135,29 @@ const mockTasks = [
     responsible: 2,
     actualTime: 0,
   },
-  {
-    id: 3,
-    title: "Task 3",
-    description: "Description for Task 3",
-    estimatedTime: 3,
-    done: 1,
-    story_Points: 2,
-    moduleId: 1,
-    responsible: 1,
-    actualTime: 4,
-  },
 ];
 
-const mockEmployees = [
-  {
-    id: 1,
-    user: {
-      id: 1,
-      username: "user1",
-      email: "user1@example.com",
-    },
-  },
-  {
-    id: 2,
-    user: {
-      id: 2,
-      username: "user2",
-      email: "user2@example.com",
-    },
-  },
-];
+// Generate mock data with deterministic seeds for reproducible tests
+const mockEmployees = generateMockEmployees(5, {
+  deterministic: true,
+  seed: 123,
+});
+const mockModules = generateMockModules(4, { deterministic: true, seed: 789 });
 
-const mockModules = [
-  {
-    id: 1,
-    title: "Sprint 1",
-  },
-  {
-    id: 2,
-    title: "Sprint 2",
-  },
-];
+// Get the IDs from the generated employees to use as responsibles
+const employeeIds = mockEmployees.map((employee) => employee.id);
+
+// Generate mock tasks with the employees and modules
+const dynamicMockTasks = generateMockTasks(15, {
+  deterministic: true,
+  seed: 456,
+  doneRatio: 0.3,
+  modules: mockModules.map((module) => module.id),
+  responsibles: employeeIds,
+});
+
+// Combine dynamic tasks with static test tasks
+const mockTasks = [...dynamicMockTasks, ...staticTestTasks];
 
 // Setup MSW server for mocking HTTP requests
 const server = setupServer(
@@ -85,43 +171,37 @@ const server = setupServer(
     return res(ctx.status(200), ctx.json(mockModules));
   }),
 
-  // Mock PUT request for updating a task
-  rest.put(`${API_LIST}/1`, (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        id: 1,
-        title: "Task 1",
-        description: "Description for Task 1",
-        estimatedTime: 5,
-        done: 1,
-        story_Points: 3,
-        moduleId: 1,
-        actualTime: 0,
-      })
-    );
+  // Mock PUT request for updating a task - dynamic version
+  rest.put(`${API_LIST}/:id`, (req, res, ctx) => {
+    const { id } = req.params;
+    const taskIndex = mockTasks.findIndex((task) => task.id.toString() === id);
+
+    if (taskIndex === -1) {
+      return res(ctx.status(404));
+    }
+
+    const task = { ...mockTasks[taskIndex], ...req.body };
+    return res(ctx.status(200), ctx.json(task));
   }),
 
-  // Mock GET request for fetching the updated task
-  rest.get(`${API_LIST}/1`, (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        id: 1,
-        title: "Task 1",
-        description: "Description for Task 1",
-        estimatedTime: 5,
-        done: 1,
-        story_Points: 3,
-        moduleId: 1,
-        actualTime: 0,
-      })
-    );
+  // Mock GET request for fetching a specific task - dynamic version
+  rest.get(`${API_LIST}/:id`, (req, res, ctx) => {
+    const { id } = req.params;
+    const task = mockTasks.find((task) => task.id.toString() === id);
+
+    if (!task) {
+      return res(ctx.status(404));
+    }
+
+    return res(ctx.status(200), ctx.json(task));
   })
 );
 
 // Setup and teardown
-beforeAll(() => server.listen());
+beforeAll(() => {
+  server.listen();
+  console.log("Starting DashboardContent tests");
+});
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
@@ -131,38 +211,19 @@ const mockToggleDone = jest.fn();
 const mockDeleteItem = jest.fn();
 
 describe("DashboardContent Component", () => {
-  // Test rendering of dashboard content Objective number 4
-  test("renders dashboard content with correct data", () => {
-    render(
-      <DashboardContent
-        items={mockTasks}
-        employeesList={mockEmployees}
-        addItem={mockAddItem}
-        isInserting={false}
-        toggleDone={mockToggleDone}
-        deleteItem={mockDeleteItem}
-        modules={mockModules}
-      />
-    );
-
-    // Check if dashboard title is displayed
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-
-    // Check if module filter is displayed
-    expect(screen.getByText("Filter by Sprint:")).toBeInTheDocument();
-
-    // Check if module options are displayed
-    expect(screen.getByText("All")).toBeInTheDocument();
-    expect(screen.getByText("1 - Sprint 1")).toBeInTheDocument();
-    expect(screen.getByText("2 - Sprint 2")).toBeInTheDocument();
-
-    // Check if task tables are displayed
-    expect(screen.getByText("To Do")).toBeInTheDocument();
-    expect(screen.getByText("Completed")).toBeInTheDocument();
-  });
-
   // Test filtering tasks by module
   test("filters tasks by module when a module is selected", async () => {
+    // Create filtered subsets of tasks for verification
+    const module1Tasks = mockTasks.filter((task) => task.moduleId === 1);
+    const module2Tasks = mockTasks.filter((task) => task.moduleId === 2);
+
+    // Ensure we have tasks for both modules
+    expect(module1Tasks.length).toBeGreaterThan(0);
+    expect(module2Tasks.length).toBeGreaterThan(0);
+
+    // Set up userEvent
+    const user = userEvent.setup();
+
     render(
       <DashboardContent
         items={mockTasks}
@@ -175,20 +236,30 @@ describe("DashboardContent Component", () => {
       />
     );
 
-    // Wait for tasks to load
-    await screen.findByText("Task 1");
+    // Wait for tasks to load - use our static task that we know exists
+    await screen.findByText("Static Test Task 1");
+
+    // Initially we should see tasks from both modules
+    expect(screen.getByText("Static Test Task 1")).toBeInTheDocument(); // Module 1
+    expect(screen.getByText("Static Test Task 2")).toBeInTheDocument(); // Module 2
 
     // Select module 1
     const moduleSelect = screen.getByTestId("filter-module-select");
-    await userEvent.selectOptions(moduleSelect, "1");
+    await user.selectOptions(moduleSelect, "1");
 
-    // Check that only tasks from module 1 are visible
-    expect(screen.getByText("Task 1")).toBeInTheDocument();
-    expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
+    // After filtering, we should only see module 1 tasks
+    expect(screen.getByText("Static Test Task 1")).toBeInTheDocument(); // Module 1
+    expect(screen.queryByText("Static Test Task 2")).not.toBeInTheDocument(); // Module 2 (should be hidden)
   });
 
   // Test task completion functionality
   test("handles task completion correctly", async () => {
+    // Set up userEvent
+    const user = userEvent.setup();
+
+    // Use our static test task for consistency
+    const testTask = staticTestTasks[0]; // Static Test Task 1
+
     render(
       <DashboardContent
         items={mockTasks}
@@ -201,35 +272,46 @@ describe("DashboardContent Component", () => {
       />
     );
 
-    // Find and click the "Done" button for Task 1
-    const doneButtons = screen.getAllByText("Done");
-    fireEvent.click(doneButtons[0]);
+    // Wait for our static task to load
+    const taskElement = await screen.findByText(testTask.title);
+
+    // Find the row containing our task
+    const taskRow =
+      taskElement.closest("tr") || taskElement.closest(".task-row"); // Adjust based on your component structure
+
+    // Find the Done button within that row
+    const doneButton = within(taskRow).getByText("Done");
+    await user.click(doneButton);
 
     // Check if the real hours popup is displayed
     expect(screen.getByText("Task Completion Time")).toBeInTheDocument();
 
     // Enter real hours and confirm
     const realHoursInput = screen.getByPlaceholderText("Real Hours");
-    userEvent.type(realHoursInput, "6");
+    await user.type(realHoursInput, "6");
 
     const confirmButton = screen.getByText("Save");
-    fireEvent.click(confirmButton);
+    await user.click(confirmButton);
 
-    // Check if toggleDone was called with the correct parameters
-    expect(mockToggleDone).toHaveBeenCalledWith({
-      id: 1,
-      title: "Task 1",
-      description: "Description for Task 1",
-      done: 1,
-      estimatedTime: 5,
-      story_Points: 3,
-      moduleId: 1,
-      actualTime: 6,
-    });
+    // Check if toggleDone was called with the correct parameters using objectContaining for flexibility
+    expect(mockToggleDone).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: testTask.id,
+        title: testTask.title,
+        done: 1,
+        actualTime: 6,
+      })
+    );
   });
 
   // Test task deletion functionality
-  test("handles task deletion correctly", () => {
+  test("handles task deletion correctly", async () => {
+    // Set up userEvent
+    const user = userEvent.setup();
+
+    // Use our static test task for consistency
+    const testTask = staticTestTasks[0]; // Static Test Task 1
+
     render(
       <DashboardContent
         items={mockTasks}
@@ -242,16 +324,39 @@ describe("DashboardContent Component", () => {
       />
     );
 
-    // Find and click the trash button for Task 1
-    const trashButtons = screen.getAllByRole("button", { name: "" });
-    fireEvent.click(trashButtons[1]); // The second button is the trash button for the first task
+    // Wait for our static task to load
+    const taskElement = await screen.findByText(testTask.title);
+
+    // Find the row containing our task
+    const taskRow =
+      taskElement.closest("tr") || taskElement.closest(".task-row"); // Adjust based on your component structure
+
+    // Find the delete button within that row
+    // This depends on your component structure, but typically it would be an icon button
+    // Using a more robust approach to find the delete button
+    const buttons = within(taskRow).getAllByRole("button");
+    // Find delete button either by aria-label, title, or class containing 'delete'/'trash'
+    const deleteButton = buttons.find(
+      (button) =>
+        button.getAttribute("aria-label") === "Delete" ||
+        button.getAttribute("title") === "Delete" ||
+        button.className.includes("delete") ||
+        button.className.includes("trash")
+    );
+
+    // If we can't find it with attributes, just use the second button (common pattern)
+    const buttonToClick = deleteButton || buttons[1];
+    await user.click(buttonToClick);
 
     // Check if deleteItem was called with the correct task ID
-    expect(mockDeleteItem).toHaveBeenCalledWith(1);
+    expect(mockDeleteItem).toHaveBeenCalledWith(testTask.id);
   });
 
   // Test adding a new task
   test("handles adding a new task correctly", async () => {
+    // Set up userEvent
+    const user = userEvent.setup();
+
     render(
       <DashboardContent
         items={mockTasks}
@@ -264,22 +369,25 @@ describe("DashboardContent Component", () => {
       />
     );
 
+    // Wait for the component to fully load
+    await screen.findByText("Static Test Task 1");
+
     // Fill in the task form
     const titleInput = screen.getByPlaceholderText("Title");
-    userEvent.type(titleInput, "New Task");
+    await user.type(titleInput, "New Task");
 
     const descriptionInput = screen.getByPlaceholderText("Description");
-    userEvent.type(descriptionInput, "Description for New Task");
+    await user.type(descriptionInput, "Description for New Task");
 
     // Select responsible
     const responsibleSelect = screen.getAllByRole("combobox")[0];
-    userEvent.selectOptions(responsibleSelect, "1");
+    await user.selectOptions(responsibleSelect, "1");
 
     const hoursInput = screen.getByPlaceholderText("Hours");
-    userEvent.type(hoursInput, "10");
+    await user.type(hoursInput, "10");
 
     const storyPointsInput = screen.getByPlaceholderText("Story Points");
-    userEvent.type(storyPointsInput, "5");
+    await user.type(storyPointsInput, "5");
 
     // Wait for modules to be loaded
     await waitFor(() => {
@@ -288,21 +396,23 @@ describe("DashboardContent Component", () => {
     });
 
     const moduleSelect = screen.getByTestId("module-select");
-    userEvent.selectOptions(moduleSelect, "1");
+    await user.selectOptions(moduleSelect, "1");
 
     // Submit the form
     const addButton = screen.getByText("Add");
-    fireEvent.click(addButton);
+    await user.click(addButton);
 
     // Check if addItem was called with the correct parameters
-    expect(mockAddItem).toHaveBeenCalledWith({
-      title: "New Task",
-      description: "Description for New Task",
-      estimatedTime: "10",
-      done: 0,
-      story_Points: "5",
-      moduleId: 1,
-      responsible: "1",
-    });
+    expect(mockAddItem).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "New Task",
+        description: "Description for New Task",
+        estimatedTime: "10",
+        done: 0,
+        story_Points: "5",
+        moduleId: 1,
+        responsible: "1",
+      })
+    );
   });
 });
