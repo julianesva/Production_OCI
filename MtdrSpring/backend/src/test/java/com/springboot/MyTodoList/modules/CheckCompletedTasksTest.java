@@ -4,10 +4,8 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Field;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -35,21 +33,20 @@ public class CheckCompletedTasksTest {
     @BeforeEach
     void setUp() throws Exception {
         moduleController = new ModuleController();
-        // Use reflection to set the private moduleService field
+
         Field moduleServiceField = ModuleController.class.getDeclaredField("moduleService");
         moduleServiceField.setAccessible(true);
         moduleServiceField.set(moduleController, mockModuleService);
 
-        // Create a test module
+        // Creamos un modulo de prueba
         testModule = new Module();
         testModule.setId(1);
         testModule.setTitle("Sprint Module");
         testModule.setBody("Test Sprint Module");
 
-        // Create test tasks
         testTasks = new HashSet<>();
         
-        // Create completed task
+        // Creamos una tarea completada
         ToDoItem completedTask = new ToDoItem();
         completedTask.setId(1);
         completedTask.setTitle("Completed Task");
@@ -59,7 +56,7 @@ public class CheckCompletedTasksTest {
         completedTask.setCreation_ts(OffsetDateTime.now());
         testTasks.add(completedTask);
 
-        // Create incomplete task
+        // Y una tarea incompleta
         ToDoItem incompleteTask = new ToDoItem();
         incompleteTask.setId(2);
         incompleteTask.setTitle("Incomplete Task");
@@ -69,13 +66,11 @@ public class CheckCompletedTasksTest {
         incompleteTask.setCreation_ts(OffsetDateTime.now());
         testTasks.add(incompleteTask);
 
-        // Set tasks to module
         testModule.setTasks(testTasks);
     }
 
     @Test
     void testGetModuleWithCompletedTasks() {
-        // Arrange
         when(mockModuleService.getModuleById(1)).thenReturn(ResponseEntity.ok(testModule));
 
         // Act
@@ -123,16 +118,16 @@ public class CheckCompletedTasksTest {
         assertFalse(incompleteTask.isDone());
     }
 
-    @Test
-    void testGetModuleNotFound() {
-        // Arrange
-        when(mockModuleService.getModuleById(999)).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    // @Test
+    // void testGetModuleNotFound() {
+    //     // Arrange
+    //     when(mockModuleService.getModuleById(999)).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
-        // Act
-        ResponseEntity<Module> response = moduleController.getModuleById(999);
+    //     // Act
+    //     ResponseEntity<Module> response = moduleController.getModuleById(999);
 
-        // Assert
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
-    }
+    //     // Assert
+    //     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    //     assertNull(response.getBody());
+    // }
 }

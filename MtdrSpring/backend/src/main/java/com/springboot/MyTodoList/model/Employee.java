@@ -90,6 +90,14 @@ public class Employee {
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 
+    public void setTasks(List<ToDoItem> tasks) {
+        this.tasks = tasks;
+    }
+
+    public List<ToDoItem> getTasks() {
+        return tasks;
+    }
+
     public User getUser() {
         return user;
     }
